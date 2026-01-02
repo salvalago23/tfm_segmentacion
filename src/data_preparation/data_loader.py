@@ -165,12 +165,16 @@ class MedicalDataLoader:
         
         return sampler
     
-    def create_dataloaders(self, shuffle_train: bool = True):
+    def create_dataloaders(self, shuffle_train: bool = True, 
+                           generator: Optional[torch.Generator] = None,
+                           worker_init_fn: Optional[callable] = None):
         """
         Crea DataLoaders a partir de los datasets
         
         Args:
             shuffle_train: Si mezclar datos de entrenamiento
+            generator: Generator de PyTorch para reproducibilidad
+            worker_init_fn: Función de inicialización de workers para reproducibilidad
         """
         print("🔄 Creando DataLoaders...")
         
@@ -192,7 +196,9 @@ class MedicalDataLoader:
             num_workers=self.num_workers,
             pin_memory=self.pin_memory,
             drop_last=True,  # Útil para batch normalization
-            persistent_workers=True if self.num_workers > 0 else False
+            persistent_workers=True if self.num_workers > 0 else False,
+            generator=generator,
+            worker_init_fn=worker_init_fn
         )
         
         print(f"  ✅ Train Loader: {len(self.train_loader)} batches")
@@ -204,7 +210,9 @@ class MedicalDataLoader:
             shuffle=False,
             num_workers=self.num_workers,
             pin_memory=self.pin_memory,
-            persistent_workers=True if self.num_workers > 0 else False
+            persistent_workers=True if self.num_workers > 0 else False,
+            generator=generator,
+            worker_init_fn=worker_init_fn
         )
         
         print(f"  ✅ Val Loader: {len(self.val_loader)} batches")
@@ -217,7 +225,9 @@ class MedicalDataLoader:
                 shuffle=False,
                 num_workers=self.num_workers,
                 pin_memory=self.pin_memory,
-                persistent_workers=True if self.num_workers > 0 else False
+                persistent_workers=True if self.num_workers > 0 else False,
+                generator=generator,
+                worker_init_fn=worker_init_fn
             )
             print(f"  ✅ Test Loader: {len(self.test_loader)} batches")
     
