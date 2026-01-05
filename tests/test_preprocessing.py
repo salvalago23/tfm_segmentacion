@@ -16,7 +16,7 @@ def test_preprocessing(processed_dir: Path, n_samples: int = 5):
         masks_dir = processed_dir / dataset / "masks"
         
         if not images_dir.exists() or not masks_dir.exists():
-            print(f"⚠️  Dataset {dataset} no encontrado")
+            print(f"Dataset {dataset} no encontrado")
             continue
         
         # Obtener algunos archivos
@@ -64,7 +64,7 @@ def test_preprocessing(processed_dir: Path, n_samples: int = 5):
 def check_statistics(processed_dir: Path):
     """Calcula estadísticas de los datos procesados"""
     
-    print("\n📊 ESTADÍSTICAS DE DATOS PROCESADOS")
+    print("\nESTADÍSTICAS DE DATOS PROCESADOS")
     print("="*40)
     
     for dataset in ['train', 'val']:

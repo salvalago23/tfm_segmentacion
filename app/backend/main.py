@@ -29,7 +29,7 @@ from pydantic import BaseModel
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from src.models import UNet, AttentionUNet, ResidualUNet, UNetPlusPlusSimplified, DeepLabV3Plus, TransUNetLite
+from src.models import UNet, AttentionUNet, ResidualUNet, UNetPlusPlus, DeepLabV3Plus, TransUNet
 from clinical_analysis import ABCDEAnalyzer
 
 
@@ -43,7 +43,7 @@ class Config:
     PATIENTS_DB = DATA_DIR / "patients.json"
     RESULTS_DIR = DATA_DIR / "results"
     
-    # Model configurations - will be populated dynamically from checkpoints
+    # Model configurations
     AVAILABLE_MODELS = {
         "unet": {
             "name": "U-Net Básica",
@@ -65,21 +65,21 @@ class Config:
         },
         "unetpp": {
             "name": "U-Net++",
-            "class": UNetPlusPlusSimplified,
+            "class": UNetPlusPlus,
             "path": MODEL_DIR / "u-net++" / "best_model.pth",
-            "kwargs": None  # Will load from checkpoint
+            "kwargs": None
         },
         "deeplabv3": {
             "name": "DeepLabV3+",
             "class": DeepLabV3Plus,
             "path": MODEL_DIR / "deeplabv3+" / "best_model.pth",
-            "kwargs": None  # Will load from checkpoint
+            "kwargs": None
         },
         "transunet": {
             "name": "TransUNet",
-            "class": TransUNetLite,
+            "class": TransUNet,
             "path": MODEL_DIR / "transunet" / "best_model.pth",
-            "kwargs": None  # Will load from checkpoint
+            "kwargs": None
         }
     }
     
@@ -188,14 +188,14 @@ class ModelManager:
             else:
                 # Use defaults based on model class
                 model_class = config["class"]
-                if model_class == UNetPlusPlusSimplified:
+                if model_class == UNetPlusPlus:
                     model_kwargs = {"in_channels": 3, "out_channels": 1, 
                                    "features": [64, 128, 256, 512], "deep_supervision": False}
                 elif model_class == DeepLabV3Plus:
                     model_kwargs = {"in_channels": 3, "out_channels": 1,
                                    "features": [64, 128, 256, 512], "aspp_channels": 256,
                                    "atrous_rates": [6, 12, 18]}
-                elif model_class == TransUNetLite:
+                elif model_class == TransUNet:
                     model_kwargs = {"in_channels": 3, "out_channels": 1,
                                    "img_size": 256, "base_features": 32,
                                    "embed_dim": 256, "num_heads": 8, "num_layers": 4}

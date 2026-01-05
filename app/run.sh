@@ -15,13 +15,6 @@ echo -e "${GREEN}    Skin Lesion Segmentation Web Application${NC}"
 echo -e "${BLUE}═══════════════════════════════════════════════════════════${NC}"
 echo ""
 
-# Check if dependencies are installed
-echo "📦 Checking dependencies..."
-if ! python -c "import fastapi" 2>/dev/null; then
-    echo "FastAPI not found. Installing app dependencies..."
-    pip install -r "$SCRIPT_DIR/requirements.txt"
-fi
-
 # Set PYTHONPATH to include project root
 export PYTHONPATH="$PROJECT_ROOT:$PYTHONPATH"
 

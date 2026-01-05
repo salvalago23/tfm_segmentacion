@@ -10,7 +10,7 @@ from src.data_preparation.data_loader import MedicalDataLoader
 def test_dataloader():
     """Prueba completa del DataLoader"""
     
-    print("🧪 PROBANDO DATALOADER")
+    print("PROBANDO DATALOADER")
     print("="*50)
     
     # Configurar DataLoader
@@ -29,7 +29,7 @@ def test_dataloader():
     try:
         data_loader.create_datasets(use_processed=True, augment_train=True)
     except Exception as e:
-        print(f"⚠️  Usando datos raw: {e}")
+        print(f"Usando datos raw: {e}")
         data_loader.create_datasets(use_processed=False, augment_train=True)
     
     # Crear DataLoaders
@@ -65,7 +65,7 @@ def test_dataloader():
             if i >= 2:  # Solo probar 3 batches
                 break
     except Exception as e:
-        print(f"❌ Error durante iteración: {e}")
+        print(f"Error durante iteración: {e}")
     
     # Estadísticas de cobertura
     print("\n7. Calculando estadísticas de cobertura...")
@@ -83,7 +83,7 @@ def test_dataloader():
         if count > 0:
             print(f"   Cobertura media en {count} muestras: {total_coverage/count:.3%}")
     
-    print("\n✅ Prueba completada exitosamente!")
+    print("\nPrueba completada exitosamente!")
 
 if __name__ == "__main__":
     test_dataloader()
