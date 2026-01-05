@@ -239,16 +239,16 @@
       "loss_function": "combined"
     },
     "DeepLabV3+": {
-      "best_val_dice": 0.892798934664045,
-      "final_val_dice": 0.8902346406664167,
-      "final_val_iou": 0.804054319858551,
+      "best_val_dice": 0.8933641314506531,
+      "final_val_dice": 0.8891180668558393,
+      "final_val_iou": 0.8020707198551723,
       "model_class": "DeepLabV3Plus",
       "loss_function": "combined"
     },
     "TransUNet": {
-      "best_val_dice": 0.8918743303843907,
-      "final_val_dice": 0.8656102589198521,
-      "final_val_iou": 0.7658000758716038,
+      "best_val_dice": 0.8870545625686646,
+      "final_val_dice": 0.8635134015764508,
+      "final_val_iou": 0.7617461511066982,
       "model_class": "TransUNet",
       "loss_function": "combined"
     }
@@ -266,8 +266,8 @@
       "Mejora Loss": 0.1928069123200008,
       "Overfitting Loss": 0.11519043224106496,
       "\u00c9pocas para converger": "10",
-      "Tiempo Total (min)": 6.254450233777364,
-      "Tiempo/\u00c9poca (s)": 18.763350701332094
+      "Tiempo Total (min)": 6.451221919059753,
+      "Tiempo/\u00c9poca (s)": 19.35366575717926
     },
     {
       "Modelo": "Attention U-Net",
@@ -281,8 +281,8 @@
       "Mejora Loss": 0.3097523003816604,
       "Overfitting Loss": 0.1319027899992792,
       "\u00c9pocas para converger": "15",
-      "Tiempo Total (min)": 9.685851267973582,
-      "Tiempo/\u00c9poca (s)": 23.246043043136595
+      "Tiempo Total (min)": 10.079646003246307,
+      "Tiempo/\u00c9poca (s)": 24.191150407791138
     },
     {
       "Modelo": "Residual U-Net",
@@ -296,8 +296,8 @@
       "Mejora Loss": 0.18581703943865638,
       "Overfitting Loss": 0.1323047100157334,
       "\u00c9pocas para converger": "21",
-      "Tiempo Total (min)": 10.710774068037669,
-      "Tiempo/\u00c9poca (s)": 20.730530454266457
+      "Tiempo Total (min)": 11.124005035559337,
+      "Tiempo/\u00c9poca (s)": 21.530332326889038
     },
     {
       "Modelo": "U-Net++",
@@ -311,39 +311,39 @@
       "Mejora Loss": 0.37776605784893036,
       "Overfitting Loss": 0.07845351625253598,
       "\u00c9pocas para converger": "21",
-      "Tiempo Total (min)": 9.501793416341146,
-      "Tiempo/\u00c9poca (s)": 18.390567902595766
+      "Tiempo Total (min)": 9.616838892300924,
+      "Tiempo/\u00c9poca (s)": 18.613236565743723
     },
     {
       "Modelo": "DeepLabV3+",
-      "Dice Inicial": 0.823605443750109,
-      "Dice Final": 0.8902346406664167,
-      "Mejora Dice": 0.06662919691630764,
-      "Mejor Dice": 0.892798934664045,
-      "Overfitting Dice": -0.016275175875036352,
-      "Loss Inicial": 0.2526501544884273,
-      "Loss Final": 0.14978859892913274,
-      "Mejora Loss": 0.10286155555929458,
-      "Overfitting Loss": 0.04818891091978529,
-      "\u00c9pocas para converger": "24",
-      "Tiempo Total (min)": 3.813872289657593,
-      "Tiempo/\u00c9poca (s)": 6.730362864101634
+      "Dice Inicial": 0.7957285557474408,
+      "Dice Final": 0.8891180668558393,
+      "Mejora Dice": 0.09338951110839844,
+      "Mejor Dice": 0.8933641314506531,
+      "Overfitting Dice": -0.004690007610505975,
+      "Loss Inicial": 0.27264106273651123,
+      "Loss Final": 0.1527640638606889,
+      "Mejora Loss": 0.11987699887582234,
+      "Overfitting Loss": 0.05828201752714483,
+      "\u00c9pocas para converger": "28",
+      "Tiempo Total (min)": 4.285995093981425,
+      "Tiempo/\u00c9poca (s)": 6.767360674707513
     },
     {
       "Modelo": "TransUNet",
-      "Dice Inicial": 0.6724846363067627,
-      "Dice Final": 0.8656102589198521,
-      "Mejora Dice": 0.1931256226130894,
-      "Mejor Dice": 0.8918743303843907,
-      "Overfitting Dice": 0.006306208656998935,
-      "Loss Inicial": 0.592276224068233,
-      "Loss Final": 0.20036859278167998,
-      "Mejora Loss": 0.39190763128655304,
-      "Overfitting Loss": 0.09186021244478605,
-      "\u00c9pocas para converger": "20",
-      "Tiempo Total (min)": 3.929455216725667,
-      "Tiempo/\u00c9poca (s)": 7.858910433451334
+      "Dice Inicial": 0.6522043006760734,
+      "Dice Final": 0.8635134015764508,
+      "Mejora Dice": 0.21130910090037747,
+      "Mejor Dice": 0.8870545625686646,
+      "Overfitting Dice": 0.012017105517143523,
+      "Loss Inicial": 0.5958676338195801,
+      "Loss Final": 0.21009268718106405,
+      "Mejora Loss": 0.385774946638516,
+      "Overfitting Loss": 0.10547910859016618,
+      "\u00c9pocas para converger": "26",
+      "Tiempo Total (min)": 4.7601497054100035,
+      "Tiempo/\u00c9poca (s)": 7.933582842350006
     }
   ],
-  "timestamp": "2026-01-05T02:49:00.389251"
+  "timestamp": "2026-01-05T15:26:12.355524"
 }

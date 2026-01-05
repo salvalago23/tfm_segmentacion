@@ -4,7 +4,6 @@ data/processed/
 *.npy
 *.npz
 
-# Checkpoints y modelos grandes
 experiments/**/*.pth
 experiments/**/*.pt
 *.pth

@@ -4,10 +4,9 @@ import numpy as np
 from .dataset import ISIC2018Dataset
 from typing import Optional, Tuple
 
-class MedicalDataLoader:
+class ISICDataLoader:
     """
-    DataLoader personalizado para datos médicos
-    Incluye balanceo de clases y configuración flexible
+    DataLoader personalizado para el dataset ISIC 2018
     """
     
     def __init__(self, 
@@ -98,19 +97,17 @@ class MedicalDataLoader:
         
         # Dataset de test (opcional)
         test_images_dir = f"{self.base_path}/{data_subdir}/test/images"
+        test_masks_dir = f"{self.base_path}/{data_subdir}/test/masks"
         
-        try:
-            self.test_dataset = ISIC2018Dataset(
-                images_dir=test_images_dir,
-                masks_dir=None,  # Test no tiene máscaras públicas
-                phase='test',
-                target_size=self.target_size,
-                augment=False,
-                debug=self.debug
-            )
-            print(f"  Test: {len(self.test_dataset)} imágenes")
-        except FileNotFoundError:
-            print("  Test: No encontrado (opcional)")
+        self.test_dataset = ISIC2018Dataset(
+            images_dir=test_images_dir,
+            masks_dir=test_masks_dir,
+            phase='test',
+            target_size=self.target_size,
+            augment=False,
+            debug=self.debug
+        )
+        print(f"  Test: {len(self.test_dataset)} imágenes")
     
     def _create_weighted_sampler(self, dataset: ISIC2018Dataset) -> WeightedRandomSampler:
         """

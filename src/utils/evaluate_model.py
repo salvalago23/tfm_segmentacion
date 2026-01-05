@@ -15,7 +15,7 @@ import pandas as pd
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
-from src.data_preparation.data_loader import MedicalDataLoader
+from src.data_preparation.data_loader import ISICDataLoader
 from src.models import UNet, AttentionUNet, ResidualUNet
 from src.models.metrics import SegmentationMetrics
 
@@ -25,12 +25,12 @@ def safe_load_checkpoint(model_path, device):
         # PyTorch 2.6+ necesita weights_only=False para algunos checkpoints
         return torch.load(model_path, map_location=device, weights_only=False)
     except Exception as e:
-        print(f"⚠️  Error con weights_only=False: {e}")
+        print(f"Error con weights_only=False: {e}")
         # Intentar método alternativo
         try:
             return torch.load(model_path, map_location=device)
         except Exception as e2:
-            print(f"❌ Error carga alternativa: {e2}")
+            print(f"Error carga alternativa: {e2}")
             raise
 
 def load_model(model_path, model_type='unet', device='cuda'):
@@ -181,7 +181,7 @@ def visualize_predictions(model, data_loader, device, num_samples=4, save_dir=No
     if save_dir:
         save_path = Path(save_dir) / 'evaluation_visualization.png'
         plt.savefig(save_path, dpi=150, bbox_inches='tight')
-        print(f"📊 Visualización guardada en: {save_path}")
+        print(f"Visualización guardada en: {save_path}")
     
     plt.show()
 
@@ -207,15 +207,15 @@ def main():
     
     # Configurar dispositivo
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    print(f"📱 Dispositivo: {device}")
+    print(f"Dispositivo: {device}")
     
     # Cargar modelo
-    print(f"\n📂 Cargando modelo: {args.model_path}")
+    print(f"\nCargando modelo: {args.model_path}")
     model, config = load_model(args.model_path, args.model_type, device)
     
     # Cargar datos
-    print(f"\n📊 Cargando datos {args.data_split}...")
-    data_loader = MedicalDataLoader(
+    print(f"\nCargando datos {args.data_split}...")
+    data_loader = ISICDataLoader(
         base_path=config.get('data', {}).get('base_path', 'data'),
         batch_size=args.batch_size,
         target_size=tuple(config.get('data', {}).get('target_size', [256, 256])),
@@ -236,18 +236,18 @@ def main():
         if data_loader.test_loader:
             eval_loader = data_loader.test_loader
         else:
-            print("⚠️  Test dataset no disponible, usando validation")
+            print("Test dataset no disponible, usando validation")
             eval_loader = data_loader.val_loader
     
     # Evaluar
-    print(f"\n🔍 Evaluando modelo...")
+    print(f"\nEvaluando modelo...")
     metrics, predictions, targets, image_ids = evaluate_model(
         model, eval_loader, device, args.threshold
     )
     
     # Mostrar resultados
     print("\n" + "="*50)
-    print("📈 RESULTADOS DE EVALUACIÓN")
+    print("RESULTADOS DE EVALUACIÓN")
     print("="*50)
     
     for metric_name, value in metrics.items():
@@ -262,7 +262,7 @@ def main():
         metrics_df = pd.DataFrame([metrics])
         metrics_path = save_dir / 'metrics.csv'
         metrics_df.to_csv(metrics_path, index=False)
-        print(f"\n💾 Métricas guardadas en: {metrics_path}")
+        print(f"\nMétricas guardadas en: {metrics_path}")
         
         # Guardar predicciones detalladas
         predictions_flat = torch.cat(predictions, dim=0).numpy()
@@ -273,14 +273,14 @@ def main():
     
     # Visualizar predicciones
     if args.visualize:
-        print(f"\n🎨 Visualizando predicciones...")
+        print(f"\nVisualizando predicciones...")
         visualize_predictions(
             model, eval_loader, device, 
             num_samples=min(4, args.batch_size),  # Asegurar que no exceda batch_size
             save_dir=args.save_results
         )
     
-    print(f"\n✅ Evaluación completada!")
+    print(f"\nEvaluación completada!")
 
 if __name__ == "__main__":
     main()

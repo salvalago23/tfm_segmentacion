@@ -16,27 +16,27 @@
     "TransUNet"
   ],
   "mejor_modelo": {
-    "nombre": "TransUNet",
+    "nombre": "DeepLabV3+",
     "metricas": {
-      "Modelo": "TransUNet",
-      "Dice Score": 0.8904990966503437,
-      "Dice ± std": "0.890 ± 0.114",
-      "IoU": 0.8050199930484478,
-      "IoU ± std": "0.817 ± 0.155",
-      "Precisión": 0.9220806314395025,
-      "Recall": 0.8639470155422504,
-      "F1-Score": 0.8904986289831308,
-      "Dice Mediana": 0.9315229654312134,
-      "Dice P25-P75": "0.873-0.957",
-      "Parámetros (M)": "39.9"
+      "Modelo": "DeepLabV3+",
+      "Dice Score": 0.8711224241256714,
+      "Dice ± std": "0.876 ± 0.144",
+      "IoU": 0.7775708031654358,
+      "IoU ± std": "0.801 ± 0.172",
+      "Precisión": 0.895518814086914,
+      "Recall": 0.8588455176353454,
+      "F1-Score": 0.8711219549179077,
+      "Dice Mediana": 0.9230758913700128,
+      "Dice P25-P75": "0.869-0.950",
+      "Parámetros (M)": "20.3"
     }
   },
   "resumen_estadistico": {
     "num_modelos": 6,
-    "num_muestras": 100,
-    "dice_promedio": 0.8688757052788367,
-    "dice_maximo": 0.8904990966503437,
-    "dice_minimo": 0.8484333478487455
+    "num_muestras": 1000,
+    "dice_promedio": 0.8469170552094778,
+    "dice_maximo": 0.8711224241256714,
+    "dice_minimo": 0.8210071158409119
   },
   "archivos_generados": [
     "experiments/comparative_analysis/metrics_comparison.csv",
@@ -44,5 +44,5 @@
     "experiments/comparative_analysis/qualitative_comparison.png",
     "experiments/comparative_analysis/comparison_state_of_art.png"
   ],
-  "timestamp": "2026-01-05T09:22:43.432704"
+  "timestamp": "2026-01-05T15:34:51.459718"
 }

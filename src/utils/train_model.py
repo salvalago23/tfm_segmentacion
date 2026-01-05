@@ -12,7 +12,7 @@ import yaml
 import argparse
 from datetime import datetime
 
-from src.data_preparation.data_loader import MedicalDataLoader
+from src.data_preparation.data_loader import ISICDataLoader
 from src.models import UNet, AttentionUNet, ResidualUNet
 from src.training.trainer import SegmentationTrainer
 
@@ -60,21 +60,21 @@ def main():
     
     config['training']['experiment_name'] = exp_name
     
-    print("🚀 INICIANDO ENTRENAMIENTO")
+    print("INICIANDO ENTRENAMIENTO")
     print("="*50)
-    print(f"📋 Configuración:")
-    print(f"   Modelo: {args.model}")
-    print(f"   Épocas: {args.epochs}")
-    print(f"   Batch size: {args.batch_size}")
-    print(f"   Experimento: {exp_name}")
+    print(f"Configuración:")
+    print(f"Modelo: {args.model}")
+    print(f"Épocas: {args.epochs}")
+    print(f"Batch size: {args.batch_size}")
+    print(f"Experimento: {exp_name}")
     
     # Configurar dispositivo
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    print(f"📱 Dispositivo: {device}")
+    print(f"Dispositivo: {device}")
     
     # Cargar datos
-    print("\n📂 Cargando datos...")
-    data_loader = MedicalDataLoader(
+    print("\nCargando datos...")
+    data_loader = ISICDataLoader(
         base_path=config['data']['base_path'],
         batch_size=config['data']['batch_size'],
         target_size=tuple(config['data']['target_size']),
@@ -89,7 +89,7 @@ def main():
     data_loader.create_dataloaders()
     
     # Crear modelo
-    print(f"\n🧠 Creando modelo {args.model}...")
+    print(f"\nCreando modelo {args.model}...")
     
     model_config = config['models'][args.model]
     
@@ -115,7 +115,7 @@ def main():
     model.to(device)
     
     # Crear trainer
-    print("\n⚙️  Configurando trainer...")
+    print("\nConfigurando trainer...")
     trainer = SegmentationTrainer(
         model=model,
         train_loader=data_loader.train_loader,
@@ -129,7 +129,7 @@ def main():
     history = trainer.train(epochs=config['training']['epochs'])
     
     # Visualizar resultados
-    print("\n📊 Visualizando resultados...")
+    print("\nVisualizando resultados...")
     trainer.visualize_results(num_samples=min(6, config['data']['batch_size']))
     
     # Guardar historial
@@ -143,12 +143,12 @@ def main():
     with open(config_path, 'w') as f:
         yaml.dump(config, f, default_flow_style=False)
     
-    print(f"\n🎉 Entrenamiento completado!")
-    print(f"   Resultados guardados en: {trainer.exp_dir}")
-    print(f"   Configuración: {config_path}")
-    print(f"   Historial: {history_path}")
-    print(f"   Mejor val_dice: {trainer.best_val_dice:.4f}")
-    print(f"   Mejor val_loss: {trainer.best_val_loss:.4f}")
+    print(f"\nEntrenamiento completado!")
+    print(f"Resultados guardados en: {trainer.exp_dir}")
+    print(f"Configuración: {config_path}")
+    print(f"Historial: {history_path}")
+    print(f"Mejor val_dice: {trainer.best_val_dice:.4f}")
+    print(f"Mejor val_loss: {trainer.best_val_loss:.4f}")
 
 if __name__ == "__main__":
     main()

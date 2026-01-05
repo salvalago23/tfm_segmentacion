@@ -28,7 +28,7 @@ def download_file(url, dest_folder="data"):
     
     # Check if file already exists
     if os.path.exists(filepath):
-        print(f"✓ {filename} already exists, skipping download...")
+        print(f"{filename} already exists, skipping download...")
         return filepath
     
     print(f"Downloading {filename}...")
@@ -53,17 +53,17 @@ def download_file(url, dest_folder="data"):
                 size = f.write(chunk)
                 pbar.update(size)
         
-        print(f"✓ {filename} downloaded successfully\n")
+        print(f"{filename} downloaded successfully\n")
         return filepath
         
     except requests.exceptions.RequestException as e:
-        print(f"✗ Error downloading {filename}: {e}\n")
+        print(f"Error downloading {filename}: {e}\n")
         return None
 
 def unzip_file(zip_path, dest_folder="data"):
     """Unzip a file and show progress"""
     if not os.path.exists(zip_path):
-        print(f"✗ {zip_path} not found, skipping unzip")
+        print(f"{zip_path} not found, skipping unzip")
         return
     
     filename = os.path.basename(zip_path)
@@ -78,11 +78,11 @@ def unzip_file(zip_path, dest_folder="data"):
             for file in tqdm(file_list, desc=f"Extracting {filename}"):
                 zip_ref.extract(file, dest_folder)
         
-        print(f"✓ {filename} extracted successfully\n")
+        print(f"{filename} extracted successfully\n")
         return True
         
     except zipfile.BadZipFile as e:
-        print(f"✗ Error unzipping {filename}: {e}\n")
+        print(f"Error unzipping {filename}: {e}\n")
         return False
 
 def organize_dataset(base_folder="data"):
@@ -113,7 +113,7 @@ def organize_dataset(base_folder="data"):
     for folder in raw_folders:
         Path(os.path.join(base_folder, folder)).mkdir(parents=True, exist_ok=True)
     
-    print("✓ Created folder structure\n")
+    print("Created folder structure\n")
     
     # Move files according to mappings
     for source_folder, dest_folder in mappings:
@@ -121,7 +121,7 @@ def organize_dataset(base_folder="data"):
         dest_path = os.path.join(base_folder, dest_folder)
         
         if not os.path.exists(source_path):
-            print(f"⚠ Warning: {source_folder} not found, skipping...")
+            print(f"Warning: {source_folder} not found, skipping...")
             continue
         
         # Get all jpg and png files
@@ -130,7 +130,7 @@ def organize_dataset(base_folder="data"):
             image_files.extend(Path(source_path).rglob(ext))
         
         if not image_files:
-            print(f"⚠ No image files found in {source_folder}")
+            print(f"No image files found in {source_folder}")
             continue
         
         print(f"Moving {len(image_files)} files from {source_folder} to {dest_folder}")
@@ -140,7 +140,7 @@ def organize_dataset(base_folder="data"):
             dest_file = os.path.join(dest_path, img_file.name)
             shutil.move(str(img_file), dest_file)
         
-        print(f"✓ Completed moving files to {dest_folder}\n")
+        print(f"Completed moving files to {dest_folder}\n")
     
     # Clean up empty source folders
     print("Cleaning up empty source folders...")
@@ -149,11 +149,11 @@ def organize_dataset(base_folder="data"):
         if os.path.exists(source_path):
             try:
                 shutil.rmtree(source_path)
-                print(f"✓ Removed {source_folder}")
+                print(f"Removed {source_folder}")
             except Exception as e:
-                print(f"⚠ Could not remove {source_folder}: {e}")
+                print(f"Could not remove {source_folder}: {e}")
     
-    print("\n✓ Dataset organization complete!")
+    print("\nDataset organization complete!")
 
 def preprocess_image(image_path, target_size=(256, 256), normalize=True):
     """Preprocess a single image"""
@@ -231,7 +231,7 @@ def preprocess_dataset(base_folder="data", target_size=(256, 256)):
         image_files = list(input_images.glob("*.jpg")) + list(input_images.glob("*.png"))
         
         if not image_files:
-            print(f"⚠ No images found in {input_images}")
+            print(f"No images found in {input_images}")
             continue
         
         print(f"Found {len(image_files)} images to process")
@@ -269,12 +269,12 @@ def preprocess_dataset(base_folder="data", target_size=(256, 256)):
                 processed_count += 1
                 
             except Exception as e:
-                print(f"\n❌ Error processing {img_id}: {e}")
+                print(f"\nError processing {img_id}: {e}")
                 continue
         
-        print(f"✓ Successfully processed {processed_count}/{len(image_files)} images for {proc_name}")
+        print(f"Successfully processed {processed_count}/{len(image_files)} images for {proc_name}")
     
-    print("\n✅ Preprocessing completed!")
+    print("\nPreprocessing completed!")
     
     # Show final statistics
     print("\n" + "="*50)
@@ -316,9 +316,9 @@ def main():
     for filepath in downloaded_files:
         try:
             os.remove(filepath)
-            print(f"✓ Deleted {os.path.basename(filepath)}")
+            print(f"Deleted {os.path.basename(filepath)}")
         except Exception as e:
-            print(f"✗ Error deleting {os.path.basename(filepath)}: {e}")
+            print(f"Error deleting {os.path.basename(filepath)}: {e}")
     
     # Organize the dataset
     organize_dataset()
@@ -326,24 +326,8 @@ def main():
     # Preprocess the dataset
     preprocess_dataset()
     
-    print("\n" + "=" * 50)
-    print("COMPLETE! Dataset is ready for training")
-    print("\nFinal structure:")
-    print("  data/")
-    print("    ├── raw/              (original organized data)")
-    print("    │   ├── isic_2018_train/")
-    print("    │   ├── isic_2018_test/")
-    print("    │   └── isic_2018_val/")
-    print("    └── processed/        (preprocessed .npy files)")
-    print("        ├── train/")
-    print("        │   ├── images/")
-    print("        │   └── masks/")
-    print("        ├── test/")
-    print("        │   └── images/")
-    print("        │   └── masks/")
-    print("        └── val/")
-    print("            ├── images/")
-    print("            └── masks/")
+    print("\nDataset is ready for training")
+
 
 if __name__ == "__main__":
     main()
