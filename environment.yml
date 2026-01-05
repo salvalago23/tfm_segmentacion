@@ -9,7 +9,6 @@ dependencies:
   - pytorch=2.0.1
   - torchvision=0.15.2
   - cudatoolkit=11.8
-  - numpy=1.24.0
   - pandas=2.0.0
   - matplotlib=3.7.0
   - scikit-learn=1.3.0
@@ -23,11 +22,11 @@ dependencies:
   - scipy=1.11.0
   
   - pip:
+    - numpy==1.23.5
     - albumentations==1.3.0
     - opencv-python==4.8.0.76
     - tensorboard==2.13.0
     - wandb==0.15.8
-
     - fastapi>=0.104.0
     - uvicorn[standard]>=0.24.0
     - python-multipart>=0.0.6
