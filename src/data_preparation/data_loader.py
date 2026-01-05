@@ -56,7 +56,7 @@ class MedicalDataLoader:
             use_processed: Si usar datos preprocesados (.npy) o raw (.jpg)
             augment_train: Si aplicar aumentación al train
         """
-        print("📂 Creando datasets...")
+        print("Creando datasets...")
         
         # Determinar rutas según si usamos procesados o raw
         if use_processed:
@@ -79,7 +79,7 @@ class MedicalDataLoader:
             debug=self.debug
         )
         
-        print(f"  ✅ Train: {len(self.train_dataset)} imágenes")
+        print(f"  Train: {len(self.train_dataset)} imágenes")
         
         # Dataset de validación
         val_images_dir = f"{self.base_path}/{data_subdir}/val/images"
@@ -94,7 +94,7 @@ class MedicalDataLoader:
             debug=self.debug
         )
         
-        print(f"  ✅ Val: {len(self.val_dataset)} imágenes")
+        print(f"  Val: {len(self.val_dataset)} imágenes")
         
         # Dataset de test (opcional)
         test_images_dir = f"{self.base_path}/{data_subdir}/test/images"
@@ -108,9 +108,9 @@ class MedicalDataLoader:
                 augment=False,
                 debug=self.debug
             )
-            print(f"  ✅ Test: {len(self.test_dataset)} imágenes")
+            print(f"  Test: {len(self.test_dataset)} imágenes")
         except FileNotFoundError:
-            print("  ⚠️  Test: No encontrado (opcional)")
+            print("  Test: No encontrado (opcional)")
     
     def _create_weighted_sampler(self, dataset: ISIC2018Dataset) -> WeightedRandomSampler:
         """
@@ -122,7 +122,7 @@ class MedicalDataLoader:
         Returns:
             WeightedRandomSampler para balanceo
         """
-        print("⚖️  Creando weighted sampler...")
+        print("Creando weighted sampler...")
         
         # Calcular pesos para cada muestra basado en cobertura de máscara
         sample_weights = []
@@ -176,7 +176,7 @@ class MedicalDataLoader:
             generator: Generator de PyTorch para reproducibilidad
             worker_init_fn: Función de inicialización de workers para reproducibilidad
         """
-        print("🔄 Creando DataLoaders...")
+        print("Creando DataLoaders...")
         
         if not self.train_dataset:
             raise ValueError("Primero crea los datasets con create_datasets()")
@@ -201,7 +201,7 @@ class MedicalDataLoader:
             worker_init_fn=worker_init_fn
         )
         
-        print(f"  ✅ Train Loader: {len(self.train_loader)} batches")
+        print(f"  Train Loader: {len(self.train_loader)} batches")
         
         # DataLoader de validación (sin shuffling)
         self.val_loader = DataLoader(
@@ -215,7 +215,7 @@ class MedicalDataLoader:
             worker_init_fn=worker_init_fn
         )
         
-        print(f"  ✅ Val Loader: {len(self.val_loader)} batches")
+        print(f"  Val Loader: {len(self.val_loader)} batches")
         
         # DataLoader de test (si existe)
         if self.test_dataset:
@@ -229,7 +229,7 @@ class MedicalDataLoader:
                 generator=generator,
                 worker_init_fn=worker_init_fn
             )
-            print(f"  ✅ Test Loader: {len(self.test_loader)} batches")
+            print(f"  Test Loader: {len(self.test_loader)} batches")
     
     def get_class_weights(self) -> Optional[torch.Tensor]:
         """
@@ -260,7 +260,7 @@ class MedicalDataLoader:
         elif phase == 'test' and self.test_loader:
             dataloader = self.test_loader
         else:
-            print(f"❌ DataLoader para fase '{phase}' no disponible")
+            print(f"DataLoader para fase '{phase}' no disponible")
             return
         
         # Obtener un batch
@@ -316,7 +316,7 @@ class MedicalDataLoader:
         plt.show()
         
         # Estadísticas del batch
-        print(f"\n📊 Estadísticas del batch ({phase}):")
+        print(f"\nEstadísticas del batch ({phase}):")
         print(f"  Batch shape: {images.shape}")
         print(f"  Rango imagen: [{images.min():.3f}, {images.max():.3f}]")
         if masks is not None:

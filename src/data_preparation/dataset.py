@@ -41,9 +41,9 @@ class ISIC2018Dataset(Dataset):
         self.image_ids = self._get_image_ids()
         
         if debug:
-            print(f"📁 Dataset {phase}: {len(self.image_ids)} imágenes")
+            print(f"Dataset {phase}: {len(self.image_ids)} imágenes")
             if self.masks_dir:
-                print(f"📁 Máscaras disponibles: {self.masks_dir.exists()}")
+                print(f"Máscaras disponibles: {self.masks_dir.exists()}")
         
         # Transformaciones
         self.transform = self._get_transforms()
@@ -144,7 +144,7 @@ class ISIC2018Dataset(Dataset):
             return mask
         
         if self.debug:
-            print(f"⚠️  No se encontró máscara para ID: {image_id}")
+            print(f"No se encontró máscara para ID: {image_id}")
         return None
     
     def __len__(self) -> int:
@@ -160,9 +160,9 @@ class ISIC2018Dataset(Dataset):
             mask = self._load_mask(image_id)
             
             if self.debug and idx == 0:
-                print(f"📊 Imagen {image_id}: shape={image.shape}, dtype={image.dtype}")
+                print(f"Imagen {image_id}: shape={image.shape}, dtype={image.dtype}")
                 if mask is not None:
-                    print(f"📊 Máscara {image_id}: shape={mask.shape}, cobertura={mask.mean():.2%}")
+                    print(f"Máscara {image_id}: shape={mask.shape}, cobertura={mask.mean():.2%}")
             
             # Aplicar transformaciones
             if mask is not None:
@@ -196,7 +196,7 @@ class ISIC2018Dataset(Dataset):
             return sample
             
         except Exception as e:
-            print(f"❌ Error cargando {image_id}: {e}")
+            print(f"Error cargando {image_id}: {e}")
             # Devolver un sample vacío para evitar romper el entrenamiento
             return self._get_empty_sample()
     
@@ -217,7 +217,7 @@ class ISIC2018Dataset(Dataset):
         if not self.masks_dir:
             return torch.tensor([1.0, 1.0])
         
-        print("⚖️  Calculando pesos de clase...")
+        print("Calculando pesos de clase...")
         total_pixels = 0
         foreground_pixels = 0
         

@@ -18,7 +18,7 @@ echo ""
 # Check if dependencies are installed
 echo "📦 Checking dependencies..."
 if ! python -c "import fastapi" 2>/dev/null; then
-    echo "⚠️  FastAPI not found. Installing app dependencies..."
+    echo "FastAPI not found. Installing app dependencies..."
     pip install -r "$SCRIPT_DIR/requirements.txt"
 fi
 
@@ -27,10 +27,10 @@ export PYTHONPATH="$PROJECT_ROOT:$PYTHONPATH"
 
 # Run the server
 echo ""
-echo "🚀 Starting server..."
-echo "   Open http://localhost:8000 in your browser"
+echo "Starting server..."
+echo "Open http://localhost:8000 in your browser"
 echo ""
-echo "   Press Ctrl+C to stop the server"
+echo "Press Ctrl+C to stop the server"
 echo ""
 
 cd "$SCRIPT_DIR/backend"

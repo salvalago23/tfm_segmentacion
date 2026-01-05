@@ -15,6 +15,9 @@ class DiceLoss(nn.Module):
         # Asegurar que las predicciones estén entre 0 y 1
         pred = torch.sigmoid(pred)
         
+        # Clampear target para estabilidad numérica
+        pred = torch.clamp(pred, min=1e-7, max=1-1e-7)
+        
         # Aplanar
         pred_flat = pred.contiguous().view(-1)
         target_flat = target.contiguous().view(-1)

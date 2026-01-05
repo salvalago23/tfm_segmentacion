@@ -8,18 +8,5 @@ uvicorn[standard]>=0.24.0
 # Data handling
 python-multipart>=0.0.6
 
-# Image processing (should already be installed from main project)
+# Image processing
 Pillow>=10.0.0
-numpy>=1.24.0
-opencv-python>=4.8.0
-scikit-image>=0.21.0
-scikit-learn>=1.3.0
-
-# Deep Learning (should already be installed from main project)
-torch>=2.0.0
-
-# Scientific computing
-scipy>=1.11.0
-
-# Note: Other dependencies like matplotlib, etc.
-# should already be installed from the main project requirements

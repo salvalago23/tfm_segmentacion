@@ -89,11 +89,15 @@ class AttentionUNet(nn.Module):
         
         for idx in range(0, len(self.ups), 2):
             x = self.ups[idx](x)
+            skip = skip_connections[idx//2]
             
-            # Aplicar atención
-            attention = self.attention_blocks[idx//2]
-            skip_with_attention = attention(g=x, x=skip_connections[idx//2])
+            # Ajustar tamaño si es necesario
+            if x.shape[:2] != skip.shape[2:]:
+                x = F.interpolate(x, size=skip.shape[2:], mode='bilinear', align_corners=False)
             
+            # Atención
+            skip_with_attention = self.attention_blocks[idx//2](g=x, x=skip)
+    
             # Concatenar
             x = torch.cat([skip_with_attention, x], dim=1)
             x = self.ups[idx+1](x)

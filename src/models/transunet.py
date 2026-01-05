@@ -233,10 +233,10 @@ class TransUNet(nn.Module):
         in_channels: int = 3,
         out_channels: int = 1,
         img_size: int = 256,
-        base_features: int = 64,
-        embed_dim: int = 768,
-        num_heads: int = 12,
-        num_layers: int = 12,
+        base_features: int = 32,#64,
+        embed_dim: int = 256,#768,
+        num_heads: int = 8,#12,
+        num_layers: int = 4,#12,
         mlp_ratio: float = 4.0,
         dropout: float = 0.1
     ):
@@ -344,47 +344,3 @@ class TransUNet(nn.Module):
         x = self.final_conv(x)
         
         return x
-
-
-class TransUNetLite(nn.Module):
-    """
-    Versión ligera de TransUNet con menos parámetros
-    Ideal para entrenar desde cero sin pesos preentrenados
-    
-    Args:
-        in_channels: Número de canales de entrada (default: 3)
-        out_channels: Número de canales de salida (default: 1)
-        img_size: Tamaño de la imagen de entrada (default: 256)
-        base_features: Características base (default: 32)
-        embed_dim: Dimensión del embedding (default: 256)
-        num_heads: Número de cabezas de atención (default: 8)
-        num_layers: Número de bloques Transformer (default: 4)
-    """
-    
-    def __init__(
-        self,
-        in_channels: int = 3,
-        out_channels: int = 1,
-        img_size: int = 256,
-        base_features: int = 32,
-        embed_dim: int = 256,
-        num_heads: int = 8,
-        num_layers: int = 4,
-        dropout: float = 0.1
-    ):
-        super().__init__()
-        
-        self.model = TransUNet(
-            in_channels=in_channels,
-            out_channels=out_channels,
-            img_size=img_size,
-            base_features=base_features,
-            embed_dim=embed_dim,
-            num_heads=num_heads,
-            num_layers=num_layers,
-            mlp_ratio=4.0,
-            dropout=dropout
-        )
-    
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return self.model(x)
