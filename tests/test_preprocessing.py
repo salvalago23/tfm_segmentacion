@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Verifica que el preprocesamiento se realizó correctamente
 """

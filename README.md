@@ -52,6 +52,7 @@ tfm_segmentacion/
 ├── downloads/                          # Archivos ZIP descargados (opcional)
 ├── requirements.txt                    # Dependencias
 └── README.md                           # Documentación
+
 📦 ARCHIVOS DESCARGADOS (ISIC 2018)
 Dataset completo descargado:
 ISIC2018_Task1-2_Training_Input.zip (10.46 GB) → 2594 imágenes training
@@ -137,93 +138,3 @@ Aumentación en tiempo real (Albumentations)
 Normalización ImageNet
 
 Soporte train/val/test
-
-🔄 EN PROGRESO:
-Preprocesamiento batch (script listo pero no ejecutado)
-
-Implementación modelos (U-Net y variantes)
-
-Sistema entrenamiento
-
-Evaluación métricas
-
-📋 PENDIENTE:
-Implementar U-Net y variantes
-
-Definir funciones pérdida (Dice, Focal, BCE)
-
-Crear sistema entrenamiento con:
-
-Early stopping
-
-Checkpoints
-
-TensorBoard logging
-
-Evaluación con métricas médicas (IoU, Dice, Sensibilidad)
-
-Comparativa modelos (baseline vs mejoras)
-
-Documentación para memoria TFM
-
-⚙️ DEPENDENCIAS INSTALADAS
-txt
-# Paquetes principales
-torch
-torchvision
-albumentations
-opencv-python
-numpy
-pandas
-matplotlib
-seaborn
-plotly
-scikit-learn
-scikit-image
-tqdm
-pyyaml
-jupyter
-
-# Entorno creado: tfm_segmentacion_env
-📊 DATOS ESTADÍSTICOS CLAVE
-Métrica	Valor	Implicación
-Tamaño imágenes	1957x2779 px	Redimensionar a 256x256
-Cobertura media	23.68%	Dataset desbalanceado
-Std cobertura	20.92%	Alta variabilidad
-Intensidad media	149.1/255	Normalizar necesario
-Train/Val/Test	2594/100/1000	Split oficial respetado
-Peso foreground	2.6169	Compensar desbalance
-🚀 PRÓXIMOS PASOS INMEDIATOS
-Opción A (Recomendada): Implementar U-Net básica
-python
-# 1. Crear src/models/unet.py
-# 2. Implementar encoder-decoder con skip connections
-# 3. Probar con DataLoader existente
-Opción B: Sistema de entrenamiento completo
-python
-# 1. Crear src/training/trainer.py
-# 2. Implementar loop entrenamiento/validación
-# 3. Añadir métricas y logging
-Opción C: Experimentación rápida
-python
-# 1. Usar modelo preentrenado (segmentation_models_pytorch)
-# 2. Entrenamiento rápido para baseline
-# 3. Iterar con mejoras
-📝 NOTAS PARA LA MEMORIA TFM
-Sección "Materiales y Métodos":
-Dataset: ISIC 2018, 2594 imágenes dermatológicas con máscaras
-
-Preprocesamiento: Redimensionado 256x256, normalización ImageNet
-
-Aumentación: Rotación (±30°), flips, ajuste brillo/contraste
-
-Balanceo: WeightedRandomSampler con pesos inversos a frecuencia
-
-Arquitectura: U-Net con encoder-decoder (por implementar)
-
-Aportación original confirmada:
-Pipeline completo desde descarga hasta DataLoader
-
-Balanceo adaptativo basado en estadísticas EDA
-
-Preparado para múltiples experimentos (U-Net, Attention U-Net, etc.)

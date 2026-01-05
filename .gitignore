@@ -1,4 +1,5 @@
 # Datos
+data/
 data/raw/
 data/processed/
 *.npy

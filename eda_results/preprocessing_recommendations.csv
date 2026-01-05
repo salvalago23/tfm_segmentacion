@@ -1,4 +1,0 @@
-categoría,recomendación,sugerencia,prioridad
-Redimensionamiento,Redimensionar a tamaño fijo. Promedio actual: 1957x2779,Usar 256x256 o 224x224 para compatibilidad con arquitecturas estándar,Alta
-Normalización,Intensidad media de píxeles: 149.1,"Normalizar a [0,1] o estandarizar con ImageNet stats",Alta
-Data Augmentation,Cobertura media: 23.68% (std: 20.92%),"Aplicar aumentaciones que preserven máscaras (rotación, flip, brillo)",Media
