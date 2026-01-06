@@ -19,23 +19,23 @@
     "nombre": "DeepLabV3+",
     "metricas": {
       "Modelo": "DeepLabV3+",
-      "Dice Score": 0.8711224241256714,
-      "Dice ± std": "0.876 ± 0.144",
-      "IoU": 0.7775708031654358,
-      "IoU ± std": "0.801 ± 0.172",
-      "Precisión": 0.895518814086914,
-      "Recall": 0.8588455176353454,
-      "F1-Score": 0.8711219549179077,
-      "Dice Mediana": 0.9230758913700128,
-      "Dice P25-P75": "0.869-0.950",
+      "Dice Score": 0.8724584670066834,
+      "Dice ± std": "0.874 ± 0.135",
+      "IoU": 0.778479043006897,
+      "IoU ± std": "0.796 ± 0.163",
+      "Precisión": 0.8780893726348877,
+      "Recall": 0.8765991806983948,
+      "F1-Score": 0.8724579916000367,
+      "Dice Mediana": 0.9190306232970876,
+      "Dice P25-P75": "0.867-0.944",
       "Parámetros (M)": "20.3"
     }
   },
   "resumen_estadistico": {
     "num_modelos": 6,
     "num_muestras": 1000,
-    "dice_promedio": 0.8469170552094778,
-    "dice_maximo": 0.8711224241256714,
+    "dice_promedio": 0.8485537181695303,
+    "dice_maximo": 0.8724584670066834,
     "dice_minimo": 0.8210071158409119
   },
   "archivos_generados": [
@@ -44,5 +44,5 @@
     "experiments/comparative_analysis/qualitative_comparison.png",
     "experiments/comparative_analysis/comparison_state_of_art.png"
   ],
-  "timestamp": "2026-01-05T15:34:51.459718"
+  "timestamp": "2026-01-06T01:04:04.818729"
 }
