@@ -39,10 +39,6 @@ class ABCDEFeatures:
     minor_axis: float
     area_mm2: float
     
-    # Texture (adicional)
-    texture_contrast: float
-    texture_homogeneity: float
-    
     def to_dict(self) -> Dict:
         """Convierte a diccionario para fácil exportación"""
         return {
@@ -60,9 +56,7 @@ class ABCDEFeatures:
             'diameter_mm': self.diameter_mm,
             'major_axis': self.major_axis,
             'minor_axis': self.minor_axis,
-            'area_mm2': self.area_mm2,
-            'texture_contrast': self.texture_contrast,
-            'texture_homogeneity': self.texture_homogeneity
+            'area_mm2': self.area_mm2
         }
 
 
@@ -98,7 +92,6 @@ class ABCDEAnalyzer:
         border = self._calculate_border(mask_binary)
         color = self._calculate_color(image, mask_binary)
         diameter = self._calculate_diameter(mask_binary)
-        texture = self._calculate_texture(image, mask_binary)
         
         return ABCDEFeatures(
             asymmetry_score=asymmetry['score'],
@@ -116,9 +109,7 @@ class ABCDEAnalyzer:
             diameter_mm=diameter['diameter_mm'],
             major_axis=diameter['major_axis'],
             minor_axis=diameter['minor_axis'],
-            area_mm2=diameter['area_mm2'],
-            texture_contrast=texture['contrast'],
-            texture_homogeneity=texture['homogeneity']
+            area_mm2=diameter['area_mm2']
         )
     
     def _calculate_asymmetry(self, mask: np.ndarray) -> Dict:
@@ -323,27 +314,6 @@ class ABCDEAnalyzer:
             'area_mm2': float(area_mm2)
         }
     
-    def _calculate_texture(self, image: np.ndarray, mask: np.ndarray) -> Dict:
-        """
-        Texture: Análisis de textura usando GLCM simplificado
-        """
-        # Convertir a escala de grises
-        gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
-        lesion_gray = gray[mask > 0]
-        
-        if len(lesion_gray) == 0:
-            return {'contrast': 0, 'homogeneity': 0}
-        
-        # Calcular contraste (rango de intensidades)
-        contrast = np.std(lesion_gray)
-        
-        # Homogeneidad (inverso de contraste normalizado)
-        homogeneity = 1 / (1 + contrast / 255)
-        
-        return {
-            'contrast': float(contrast),
-            'homogeneity': float(homogeneity)
-        }
     
     def visualize_analysis(self, image: np.ndarray, mask: np.ndarray, 
                           features: ABCDEFeatures) -> np.ndarray:

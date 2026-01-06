@@ -171,7 +171,7 @@ class ModelManager:
         if not config["path"].exists():
             raise FileNotFoundError(f"Model file not found: {config['path']}")
         
-        print(f"📂 Loading {config['name']}...")
+        print(f"Loading {config['name']}...")
         
         # Load checkpoint first to get config
         checkpoint = torch.load(config["path"], map_location=self.device, weights_only=False)
@@ -208,7 +208,7 @@ class ModelManager:
         try:
             model = config["class"](**model_kwargs)
         except Exception as e:
-            print(f"❌ Error creating model with kwargs {model_kwargs}: {e}")
+            print(f"Error creating model with kwargs {model_kwargs}: {e}")
             raise
         
         # Load weights
@@ -220,14 +220,14 @@ class ModelManager:
             else:
                 model.load_state_dict(checkpoint)
         except Exception as e:
-            print(f"❌ Error loading weights: {e}")
+            print(f"Error loading weights: {e}")
             raise
         
         model.to(self.device)
         model.eval()
         
         self.loaded_models[model_key] = model
-        print(f"✅ {config['name']} loaded successfully")
+        print(f"{config['name']} loaded successfully")
         
         return model
     
@@ -517,13 +517,13 @@ async def lifespan(app: FastAPI):
     """Application lifespan handler"""
     global model_manager, db_manager
     
-    print("🚀 Starting Skin Lesion Segmentation App...")
+    print("Starting Skin Lesion Segmentation App...")
     model_manager = ModelManager()
     db_manager = DatabaseManager()
     
     yield
     
-    print("👋 Shutting down...")
+    print("Shutting down...")
 
 app = FastAPI(
     title="Skin Lesion Segmentation",
@@ -640,7 +640,7 @@ async def predict(
         try:
             abcd_features = analyze_abcd_features(np.array(original_resized), mask)
         except Exception as e:
-            print(f"⚠️ ABCD analysis error: {e}")
+            print(f"ABCD analysis error: {e}")
         
         # Create result
         result = PredictionResult(
