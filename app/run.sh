@@ -1,24 +1,24 @@
 #!/bin/bash
-# Run the Skin Lesion Segmentation Web Application
+# Ejecuta la aplicación web de segmentación de lesiones cutáneas
 
-# Get the directory where the script is located
+# Obtener el directorio donde se encuentra el script
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 
-# Colors for output
+# Colores para la salida
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+NC='\033[0m' # Sin color
 
 echo -e "${BLUE}═══════════════════════════════════════════════════════════${NC}"
 echo -e "${GREEN}    Skin Lesion Segmentation Web Application${NC}"
 echo -e "${BLUE}═══════════════════════════════════════════════════════════${NC}"
 echo ""
 
-# Set PYTHONPATH to include project root
+# Establecer PYTHONPATH para incluir la raíz del proyecto
 export PYTHONPATH="$PROJECT_ROOT:$PYTHONPATH"
 
-# Run the server
+# Ejecutar el servidor
 echo ""
 echo "Starting server..."
 echo "Open http://localhost:8000 in your browser"

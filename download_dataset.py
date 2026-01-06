@@ -7,7 +7,7 @@ import cv2
 from pathlib import Path
 from tqdm import tqdm
 
-# URLs to download
+# URLs para descargar
 urls = [
     "https://isic-archive.s3.amazonaws.com/challenges/2018/ISIC2018_Task1-2_Training_Input.zip",
     "https://isic-archive.s3.amazonaws.com/challenges/2018/ISIC2018_Task1_Training_GroundTruth.zip",
@@ -18,15 +18,15 @@ urls = [
 ]
 
 def download_file(url, dest_folder="data"):
-    """Download a file with progress bar"""
-    # Create destination folder if it doesn't exist
+    """Descargar un archivo con barra de progreso"""
+    # Crear la carpeta de destino si no existe
     Path(dest_folder).mkdir(parents=True, exist_ok=True)
     
-    # Extract filename from URL
+    # Extraer el nombre del archivo de la URL
     filename = url.split("/")[-1]
     filepath = os.path.join(dest_folder, filename)
     
-    # Check if file already exists
+    # Comprobar si el archivo ya existe
     if os.path.exists(filepath):
         print(f"{filename} already exists, skipping download...")
         return filepath
@@ -34,14 +34,14 @@ def download_file(url, dest_folder="data"):
     print(f"Downloading {filename}...")
     
     try:
-        # Stream the download
+        # Descargar en streaming
         response = requests.get(url, stream=True)
         response.raise_for_status()
         
-        # Get total file size
+        # Obtener el tamaño total del archivo
         total_size = int(response.headers.get('content-length', 0))
         
-        # Download with progress bar
+        # Descargar con barra de progreso
         with open(filepath, 'wb') as f, tqdm(
             desc=filename,
             total=total_size,
@@ -61,7 +61,7 @@ def download_file(url, dest_folder="data"):
         return None
 
 def unzip_file(zip_path, dest_folder="data"):
-    """Unzip a file and show progress"""
+    """Descomprimir un archivo y mostrar el progreso"""
     if not os.path.exists(zip_path):
         print(f"{zip_path} not found, skipping unzip")
         return
@@ -71,10 +71,10 @@ def unzip_file(zip_path, dest_folder="data"):
     
     try:
         with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-            # Get list of files in archive
+            # Obtener la lista de archivos en el archivo comprimido
             file_list = zip_ref.namelist()
             
-            # Extract with progress bar
+            # Extraer con barra de progreso
             for file in tqdm(file_list, desc=f"Extracting {filename}"):
                 zip_ref.extract(file, dest_folder)
         
@@ -86,11 +86,11 @@ def unzip_file(zip_path, dest_folder="data"):
         return False
 
 def organize_dataset(base_folder="data"):
-    """Organize the dataset into raw folder structure"""
+    """Organizar el dataset en la estructura de carpetas raw"""
     print("\n" + "=" * 50)
     print("Organizing dataset into structured folders...\n")
     
-    # Define the mapping of source to destination
+    # Definir el mapeo de origen a destino
     mappings = [
         ("ISIC2018_Task1-2_Training_Input", "raw/isic_2018_train/images"),
         ("ISIC2018_Task1_Training_GroundTruth", "raw/isic_2018_train/masks"),
@@ -100,7 +100,7 @@ def organize_dataset(base_folder="data"):
         ("ISIC2018_Task1_Validation_GroundTruth", "raw/isic_2018_val/masks"),
     ]
     
-    # Create the raw folder structure
+    # Crear la estructura de carpetas raw
     raw_folders = [
         "raw/isic_2018_train/images",
         "raw/isic_2018_train/masks",
@@ -115,7 +115,7 @@ def organize_dataset(base_folder="data"):
     
     print("Created folder structure\n")
     
-    # Move files according to mappings
+    # Mover archivos según los mapeos
     for source_folder, dest_folder in mappings:
         source_path = os.path.join(base_folder, source_folder)
         dest_path = os.path.join(base_folder, dest_folder)
@@ -124,7 +124,7 @@ def organize_dataset(base_folder="data"):
             print(f"Warning: {source_folder} not found, skipping...")
             continue
         
-        # Get all jpg and png files
+        # Obtener todos los archivos jpg y png
         image_files = []
         for ext in ['*.jpg', '*.jpeg', '*.png', '*.JPG', '*.JPEG', '*.PNG']:
             image_files.extend(Path(source_path).rglob(ext))
@@ -135,14 +135,14 @@ def organize_dataset(base_folder="data"):
         
         print(f"Moving {len(image_files)} files from {source_folder} to {dest_folder}")
         
-        # Move files with progress bar
+        # Mover archivos con barra de progreso
         for img_file in tqdm(image_files, desc=f"Moving to {dest_folder}"):
             dest_file = os.path.join(dest_path, img_file.name)
             shutil.move(str(img_file), dest_file)
         
         print(f"Completed moving files to {dest_folder}\n")
     
-    # Clean up empty source folders
+    # Limpiar carpetas de origen vacías
     print("Cleaning up empty source folders...")
     for source_folder, _ in mappings:
         source_path = os.path.join(base_folder, source_folder)
@@ -157,48 +157,48 @@ def organize_dataset(base_folder="data"):
 
 def preprocess_image(image_path, target_size=(256, 256), normalize=True):
     """Preprocess a single image"""
-    # Read image
+    # Leer imagen
     img = cv2.imread(str(image_path))
     if img is None:
         raise ValueError(f"Could not read image: {image_path}")
     
-    # Convert BGR to RGB
+    # Convertir BGR a RGB
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     
-    # Resize
+    # Redimensionar
     img = cv2.resize(img, target_size, interpolation=cv2.INTER_LINEAR)
     
-    # Normalize to [0, 1] if requested
+    # Normalizar a [0, 1] si se solicita
     if normalize:
         img = img.astype(np.float32) / 255.0
     
     return img
 
 def preprocess_mask(mask_path, target_size=(256, 256)):
-    """Preprocess a single mask"""
-    # Read mask (grayscale)
+    """Preprocesar una sola máscara"""
+    # Leer máscara (escala de grises)
     mask = cv2.imread(str(mask_path), cv2.IMREAD_GRAYSCALE)
     if mask is None:
         raise ValueError(f"Could not read mask: {mask_path}")
     
-    # Resize using nearest neighbor to preserve binary values
+    # Redimensionar usando vecino más cercano para preservar valores binarios
     mask = cv2.resize(mask, target_size, interpolation=cv2.INTER_NEAREST)
     
-    # Binarize (threshold at 127)
+    # Binarizar (umbral en 127)
     _, mask = cv2.threshold(mask, 127, 255, cv2.THRESH_BINARY)
     
-    # Convert to 0 and 1
+    # Convertir a 0 y 1
     mask = (mask / 255).astype(np.uint8)
     
     return mask
 
 def preprocess_dataset(base_folder="data", target_size=(256, 256)):
     """
-    Preprocess the entire dataset and save as .npy files
+    Preprocesar todo el dataset y guardar como archivos .npy
     
     Args:
-        base_folder: Base directory containing the raw data
-        target_size: Target size (height, width)
+        base_folder: Directorio base que contiene los datos raw
+        target_size: Tamaño objetivo (alto, ancho)
     """
     print("\n" + "=" * 50)
     print("PREPROCESSING DATASET")
@@ -218,16 +218,16 @@ def preprocess_dataset(base_folder="data", target_size=(256, 256)):
         print(f"Processing dataset: {proc_name}")
         print(f"{'='*50}")
         
-        # Create output directories
+        # Crear directorios de salida
         dataset_output = processed_dir / proc_name
         (dataset_output / "images").mkdir(parents=True, exist_ok=True)
         (dataset_output / "masks").mkdir(parents=True, exist_ok=True)
         
-        # Input paths
+        # Rutas de entrada
         input_images = raw_dir / raw_name / "images"
         input_masks = raw_dir / raw_name / "masks"
         
-        # Get list of images
+        # Obtener lista de imágenes
         image_files = list(input_images.glob("*.jpg")) + list(input_images.glob("*.png"))
         
         if not image_files:
@@ -236,31 +236,31 @@ def preprocess_dataset(base_folder="data", target_size=(256, 256)):
         
         print(f"Found {len(image_files)} images to process")
         
-        # Process each image
+        # Procesar cada imagen
         processed_count = 0
         for img_path in tqdm(image_files, desc=f"Processing {proc_name}"):
             img_id = img_path.stem
             
-            # Determine mask path
+            # Determinar la ruta de la máscara
             mask_path = None
             if input_masks:
                 mask_path = input_masks / f"{img_id}_segmentation.png"
                 if not mask_path.exists():
-                    # Try without _segmentation suffix
+                    # Intentar sin el sufijo _segmentation
                     mask_path = input_masks / f"{img_id}.png"
                     if not mask_path.exists():
                         print(f"\n⚠ Mask not found for {img_id}, skipping...")
                         continue
             
             try:
-                # Process image
+                # Procesar imagen
                 image_proc = preprocess_image(img_path, target_size, normalize=True)
                 
-                # Save processed image
+                # Guardar imagen procesada
                 img_output = dataset_output / "images" / f"{img_id}.npy"
                 np.save(img_output, image_proc)
                 
-                # Process and save mask if exists
+                # Procesar y guardar máscara si existe
                 if mask_path:
                     mask_proc = preprocess_mask(mask_path, target_size)
                     mask_output = dataset_output / "masks" / f"{img_id}.npy"
@@ -276,7 +276,7 @@ def preprocess_dataset(base_folder="data", target_size=(256, 256)):
     
     print("\nPreprocessing completed!")
     
-    # Show final statistics
+    # Mostrar estadísticas finales
     print("\n" + "="*50)
     print("FINAL PREPROCESSING STATISTICS")
     print("="*50)
@@ -296,7 +296,7 @@ def main():
     
     downloaded_files = []
     
-    # Download all files
+    # Descargar todos los archivos
     for url in urls:
         filepath = download_file(url)
         if filepath:
@@ -305,14 +305,14 @@ def main():
     print("\n" + "=" * 50)
     print("Unzipping files...\n")
     
-    # Unzip all downloaded files
+    # Descomprimir todos los archivos descargados
     for filepath in downloaded_files:
         unzip_file(filepath)
     
     print("=" * 50)
     print("Deleting original zip files...\n")
     
-    # Delete zip files
+    # Eliminar archivos zip
     for filepath in downloaded_files:
         try:
             os.remove(filepath)
@@ -320,10 +320,10 @@ def main():
         except Exception as e:
             print(f"Error deleting {os.path.basename(filepath)}: {e}")
     
-    # Organize the dataset
+    # Organizar el dataset
     organize_dataset()
     
-    # Preprocess the dataset
+    # Preprocesar el dataset
     preprocess_dataset()
     
     print("\nDataset is ready for training")
