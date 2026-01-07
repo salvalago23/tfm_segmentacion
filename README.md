@@ -24,9 +24,10 @@ ISIC2018_Task1_Validation_GroundTruth.zip (1 MB) → 100 máscaras validation
 
 ISIC2018_Task1-2_Test_Input.zip (2.26 GB) → 1000 imágenes test
 
-ISIC2018_Task1_Test_GroundTruth.zip → 1000 máscaras test
+ISIC2018_Task1_Test_GroundTruth.zip (11 MB) → 1000 máscaras test
 
 Total descargado: ~13 GB
+
 
 
 
