@@ -4,11 +4,6 @@ data/processed/
 *.npy
 *.npz
 
-experiments/**/*.pth
-experiments/**/*.pt
-*.pth
-*.pt
-
 __pycache__/
 
 .ipynb_checkpoints
