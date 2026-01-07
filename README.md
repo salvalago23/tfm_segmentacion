@@ -1,140 +1,35 @@
-RESUMEN COMPLETO DEL PROYECTO TFM - SEGMENTACIÓN DE IMÁGENES MÉDICAS
-📁 ESTRUCTURA DEL PROYECTO COMPLETA
-text
-tfm_segmentacion/
-│
-├── data/                               # Datos
-│   ├── raw/                            # Datos originales descargados
-│   │   ├── isic2018_train/             # Training oficial (2594 imágenes)
-│   │   │   ├── images/                 # ISIC_XXXXXXX.jpg
-│   │   │   └── masks/                  # ISIC_XXXXXXX_segmentation.png
-│   │   ├── isic2018_val/               # Validation oficial (100 imágenes)
-│   │   │   ├── images/
-│   │   │   └── masks/
-│   │   └── isic2018_test/              # Test oficial (1000 imágenes)
-│   │       └── images/                 # Sin máscaras públicas
-│   │
-│   └── processed/                      # Datos preprocesados (por crear)
-│       ├── train/
-│       ├── val/
-│       └── test/
-│
-├── notebooks/                          # Análisis exploratorio
-│   ├── 01_eda.ipynb                    # EDA original (HAM10000 + ISIC)
-│   └── 01_eda_isic2018.ipynb           # EDA completo (Train/Val/Test)
-│
-├── src/                                # Código fuente
-│   ├── data_preparation/
-│   │   ├── __init__.py
-│   │   ├── data_loader.py              # MedicalDataLoader (PyTorch)
-│   │   ├── dataset.py                  # ISIC2018Dataset
-│   │   └── preprocessing.py            # MedicalImagePreprocessor
-│   │
-│   ├── models/                         # (POR IMPLEMENTAR)
-│   ├── training/                       # (POR IMPLEMENTAR)
-│   ├── evaluation/                     # (POR IMPLEMENTAR)
-│   └── utils/                          # (POR IMPLEMENTAR)
-│
-├── scripts/                            # Scripts ejecutables
-│   ├── organize_isic2018.py            # Organiza archivos descargados
-│   ├── preprocess_dataset.py           # Preprocesa imágenes
-│   ├── verify_preprocessing.py         # Verifica preprocesamiento
-│   └── test_dataloader.py              # Prueba DataLoader
-│
-├── config/                             # Configuraciones
-│   └── data_config.yaml                # Config data (plantilla)
-│
-├── eda_results/                        # Resultados del EDA
-│   ├── dataset_comparison.csv
-│   ├── preprocessing_recommendations.csv
-│   └── detailed_stats.json
-│
-├── downloads/                          # Archivos ZIP descargados (opcional)
-├── requirements.txt                    # Dependencias
-└── README.md                           # Documentación
+## Prerrequisitos
+- Git LFS (para poder descargar los modelos)
 
-📦 ARCHIVOS DESCARGADOS (ISIC 2018)
-Dataset completo descargado:
-ISIC2018_Task1-2_Training_Input.zip (10.46 GB) → 2594 imágenes training
+## Descarga del proyecto
+- git lfs install
+- git clone https://github.com/yourname/your-repo.git
 
-ISIC2018_Task1_Training_GroundTruth.zip (33 MB) → 2594 máscaras training
+# Instalación (en el directorio raíz del proyecto)
+- conda env create -f environment.yml
+- conda activate tfm_segmentacion_env
 
-ISIC2018_Task1-2_Validation_Input.zip (228 MB) → 100 imágenes validation
+- python3 download_dataset.py
 
-ISIC2018_Task1_Validation_GroundTruth.zip (1 MB) → 100 máscaras validation
 
-ISIC2018_Task1-2_Test_Input.zip (2.26 GB) → 1000 imágenes test
+## ARCHIVOS DESCARGADOS (ISIC 2018)
+El dataset completo ocupa ~13 GB
 
-ISIC2018_Task1_Test_GroundTruth.zip (opcional, no usado)
+- ISIC2018 Training Input (10.46 GB) → 2594 imágenes training
+- ISIC2018 Training GroundTruth (33 MB) → 2594 máscaras training
+- ISIC2018 Validation Input (228 MB) → 100 imágenes validation
+- ISIC2018 Validation GroundTruth (1 MB) → 100 máscaras validation
+- ISIC2018 Test Input (2.26 GB) → 1000 imágenes test
+- ISIC2018 Test GroundTruth (11 MB) → 1000 máscaras test
 
-Total descargado: ~13 GB
 
-🔧 SCRIPTS EJECUTADOS Y SALIDAS
-1. python organize_isic2018.py
-Objetivo: Organizar archivos ZIP en estructura de carpetas
+### Todo el EDA, entrenamiento de modelos y análisis de los resultados de los mismos se pueden encontrar en los 3 Jupyter Notebook del directorio ./notebooks
 
-Resultado: Datos organizados en data/raw/
+### Para ejecutar la app, basta con moverse al directorio ./app y ejecutar el archivo bash run.sh
 
-2. notebooks/01_eda_isic2018.ipynb
-Objetivo: Análisis exploratorio completo
 
-Hallazgos clave:
 
-Imágenes muy grandes: 1957x2779 px en promedio
 
-Cobertura media lesiones: 23.68% (std 20.92%)
 
-Intensidad píxel media: 149.1/255 (imágenes oscuras)
 
-Train: 2594 imágenes, Val: 100, Test: 1000
 
-Recomendaciones:
-
-Redimensionar a 256x256
-
-Normalizar a [0,1]
-
-Aumentación de datos (rotación, flip, brillo)
-
-3. python scripts/test_dataloader.py
-Objetivo: Probar DataLoader PyTorch
-
-Resultados:
-
-✅ Datasets cargados correctamente
-
-⚖️ Pesos de clase calculados:
-
-Background: 0.6181
-
-Foreground: 2.6169 (lesiones pesan 4x más)
-
-📊 Coberturas:
-
-Train batch: 7.101%
-
-Val batch: 20.808%
-
-Media 100 muestras: 18.595%
-
-⚠️ Warnings menores corregibles
-
-🎯 ESTADO ACTUAL
-✅ COMPLETADO:
-Definición del proyecto: Segmentación 2D de imágenes dermatológicas
-
-Descarga dataset: ISIC 2018 completo (13 GB)
-
-Organización datos: Estructura limpia en data/raw/
-
-EDA completo: Análisis estadístico y visual
-
-DataLoader PyTorch: Funcional con:
-
-Balanceo de clases (WeightedRandomSampler)
-
-Aumentación en tiempo real (Albumentations)
-
-Normalización ImageNet
-
-Soporte train/val/test
