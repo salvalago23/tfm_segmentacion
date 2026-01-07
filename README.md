@@ -2,14 +2,14 @@
 - Git LFS (install from https://git-lfs.github.com)
 
 ## Descarga del proyecto
-git lfs install
-git clone https://github.com/yourname/your-repo.git
+- git lfs install
+- git clone https://github.com/yourname/your-repo.git
 
 # Instalación (en el directorio raíz del proyecto)
-conda env create -f environment.yml
-conda activate tfm_segmentacion_env
+- conda env create -f environment.yml
+- conda activate tfm_segmentacion_env
 
-python3 download_dataset.py
+- python3 download_dataset.py
 
 
 ARCHIVOS DESCARGADOS (ISIC 2018)
@@ -27,6 +27,7 @@ ISIC2018_Task1-2_Test_Input.zip (2.26 GB) → 1000 imágenes test
 ISIC2018_Task1_Test_GroundTruth.zip → 1000 máscaras test
 
 Total descargado: ~13 GB
+
 
 
 
