@@ -1,5 +1,5 @@
 ## Prerrequisitos
-- Git LFS (install from https://git-lfs.github.com)
+- Git LFS (para poder descargar los modelos)
 
 ## Descarga del proyecto
 - git lfs install
@@ -27,6 +27,7 @@ ISIC2018_Task1-2_Test_Input.zip (2.26 GB) → 1000 imágenes test
 ISIC2018_Task1_Test_GroundTruth.zip → 1000 máscaras test
 
 Total descargado: ~13 GB
+
 
 
 
