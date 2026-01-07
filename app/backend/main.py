@@ -1,6 +1,6 @@
 """
-Skin Lesion Segmentation Web Application - Backend
-FastAPI server for model inference and patient management
+Aplicación web de segmentación de lesiones cutáneas - Backend
+Servidor FastAPI para inferencia de modelos y gestión de pacientes
 """
 
 import os
@@ -22,19 +22,20 @@ import base64
 from fastapi import FastAPI, UploadFile, File, HTTPException, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 
-# Add project root to path
+ # Añadir la raíz del proyecto al path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.models import UNet, AttentionUNet, ResidualUNet, UNetPlusPlus, DeepLabV3Plus, TransUNet
-from clinical_analysis import ABCDEAnalyzer
+from clinical_analysis import ABCDAnalyzer
+
 
 
 # ============================================================================
-# Configuration
+# Configuración
 # ============================================================================
 
 class Config:
@@ -43,7 +44,7 @@ class Config:
     PATIENTS_DB = DATA_DIR / "patients.json"
     RESULTS_DIR = DATA_DIR / "results"
     
-    # Model configurations
+    # Configuraciones de modelos
     AVAILABLE_MODELS = {
         "unet": {
             "name": "U-Net Básica",
@@ -83,15 +84,16 @@ class Config:
         }
     }
     
-    # Image preprocessing
+    # Preprocesado de imágenes
     TARGET_SIZE = (256, 256)
     MEAN = np.array([0.485, 0.456, 0.406])
     STD = np.array([0.229, 0.224, 0.225])
     THRESHOLD = 0.5
 
 
+
 # ============================================================================
-# Data Models
+# Modelos de datos
 # ============================================================================
 
 class Patient(BaseModel):
@@ -101,14 +103,14 @@ class Patient(BaseModel):
     notes: Optional[str] = ""
 
 class ABCDFeatures(BaseModel):
-    """ABCD Dermatoscopic Features"""
-    # A - Asymmetry
+    """Características dermatoscópicas ABCD"""
+    # A - Asimetría
     asymmetry_score: float
     asymmetry_x: float
     asymmetry_y: float
     asymmetry_risk: str  # Low/Medium/High
     
-    # B - Border
+    # B - Borde
     border_irregularity: float
     compactness: float
     border_risk: str  # Low/Medium/High
@@ -121,12 +123,12 @@ class ABCDFeatures(BaseModel):
     has_red: bool
     color_risk: str  # Low/Medium/High
     
-    # D - Diameter
+    # D - Diámetro
     diameter_mm: float
     area_mm2: float
     diameter_risk: str  # Low/Medium/High
     
-    # Overall risk assessment
+    # Evaluación global de riesgo
     overall_risk: str  # Low/Medium/High
     risk_score: float  # 0-10
 
@@ -140,7 +142,7 @@ class PredictionResult(BaseModel):
     original_image: str  # Base64
     segmentation_mask: str  # Base64
     overlay_image: str  # Base64
-    abcd_features: Optional[ABCDFeatures] = None  # Clinical analysis
+    abcd_features: Optional[ABCDFeatures] = None  # Análisis clínico
 
 class PredictionResponse(BaseModel):
     success: bool
@@ -148,8 +150,9 @@ class PredictionResponse(BaseModel):
     error: Optional[str] = None
 
 
+
 # ============================================================================
-# Model Management
+# Gestión de modelos
 # ============================================================================
 
 class ModelManager:
@@ -159,7 +162,7 @@ class ModelManager:
         print(f"🔧 Device: {self.device}")
     
     def load_model(self, model_key: str):
-        """Load a model by key"""
+        """Carga un modelo por clave"""
         if model_key in self.loaded_models:
             return self.loaded_models[model_key]
         
@@ -173,20 +176,20 @@ class ModelManager:
         
         print(f"Loading {config['name']}...")
         
-        # Load checkpoint first to get config
+        # Cargar el checkpoint primero para obtener la configuración
         checkpoint = torch.load(config["path"], map_location=self.device, weights_only=False)
         
-        # Determine model kwargs - prefer checkpoint config, fallback to default
+        # Determinar los kwargs del modelo - preferir la configuración del checkpoint, si no usar por defecto
         model_kwargs = config["kwargs"]
         
         if model_kwargs is None:
-            # Need to get kwargs from checkpoint
+            # Se deben obtener los kwargs del checkpoint
             if 'config' in checkpoint:
                 saved_config = checkpoint['config']
                 model_kwargs = saved_config.get('model_kwargs', {})
                 print(f"   Using kwargs from checkpoint: {model_kwargs}")
             else:
-                # Use defaults based on model class
+                # Usar valores por defecto según la clase del modelo
                 model_class = config["class"]
                 if model_class == UNetPlusPlus:
                     model_kwargs = {"in_channels": 3, "out_channels": 1, 
@@ -204,14 +207,14 @@ class ModelManager:
                                    "features": [64, 128, 256, 512]}
                 print(f"   Using default kwargs: {model_kwargs}")
         
-        # Create model instance
+        # Crear instancia del modelo
         try:
             model = config["class"](**model_kwargs)
         except Exception as e:
             print(f"Error creating model with kwargs {model_kwargs}: {e}")
             raise
         
-        # Load weights
+        # Cargar pesos
         try:
             if 'model_state_dict' in checkpoint:
                 model.load_state_dict(checkpoint['model_state_dict'])
@@ -244,34 +247,34 @@ class ModelManager:
     
     def preprocess_image(self, image: Image.Image) -> torch.Tensor:
         """Preprocess image for model input"""
-        # Resize
+        # Redimensionar
         image = image.resize(Config.TARGET_SIZE, Image.BILINEAR)
         
-        # Convert to numpy
+        # Convertir a numpy
         img_array = np.array(image).astype(np.float32) / 255.0
         
-        # Handle grayscale
+        # Manejar escala de grises
         if len(img_array.shape) == 2:
             img_array = np.stack([img_array] * 3, axis=-1)
         elif img_array.shape[-1] == 4:  # RGBA
             img_array = img_array[:, :, :3]
         
-        # Normalize
+        # Normalizar
         img_array = (img_array - Config.MEAN) / Config.STD
         
-        # Convert to tensor (C, H, W)
+        # Convertir a tensor (C, H, W)
         tensor = torch.from_numpy(img_array.transpose(2, 0, 1)).float()
         
-        return tensor.unsqueeze(0)  # Add batch dimension
+        return tensor.unsqueeze(0)  # Añadir dimensión de batch
     
     def predict(self, model_key: str, image: Image.Image) -> tuple:
-        """Run prediction and return mask with timing"""
+        """Realiza la predicción y devuelve la máscara con el tiempo de inferencia"""
         model = self.load_model(model_key)
         
-        # Preprocess
+        # Preprocesar
         input_tensor = self.preprocess_image(image).to(self.device)
         
-        # Inference with timing
+        # Inferencia con temporización
         start_time = time.time()
         
         with torch.no_grad():
@@ -281,15 +284,16 @@ class ModelManager:
         
         inference_time = (time.time() - start_time) * 1000  # ms
         
-        # Convert to numpy
+        # Convertir a numpy
         mask_np = mask[0, 0].cpu().numpy()
         prob_np = prob[0, 0].cpu().numpy()
         
         return mask_np, prob_np, inference_time
 
 
+
 # ============================================================================
-# Database Management (Simple JSON-based)
+# Gestión de base de datos (basada en JSON simple)
 # ============================================================================
 
 class DatabaseManager:
@@ -308,7 +312,7 @@ class DatabaseManager:
         with open(Config.PATIENTS_DB, 'w') as f:
             json.dump(data, f, indent=2)
     
-    # Patient methods
+    # Métodos de pacientes
     def create_patient(self, name: str, notes: str = "") -> Patient:
         db = self._load_db()
         patient_id = str(uuid.uuid4())[:8]
@@ -339,14 +343,14 @@ class DatabaseManager:
         db = self._load_db()
         if patient_id in db["patients"]:
             del db["patients"][patient_id]
-            # Also delete associated results
+            # También elimina los resultados asociados
             db["results"] = {k: v for k, v in db["results"].items() 
                            if v.get("patient_id") != patient_id}
             self._save_db(db)
             return True
         return False
     
-    # Results methods
+    # Métodos de resultados
     def save_result(self, result: PredictionResult):
         db = self._load_db()
         db["results"][result.id] = result.model_dump()
@@ -363,20 +367,30 @@ class DatabaseManager:
         if result_id in db["results"]:
             return PredictionResult(**db["results"][result_id])
         return None
+    
+    def delete_result(self, result_id: str) -> bool:
+        """Borra un resultado específico por ID"""
+        db = self._load_db()
+        if result_id in db["results"]:
+            del db["results"][result_id]
+            self._save_db(db)
+            return True
+        return False
+
 
 
 # ============================================================================
-# Image utilities
+# Utilidades de imagen
 # ============================================================================
 
 def image_to_base64(image: Image.Image, format: str = "PNG") -> str:
-    """Convert PIL Image to base64 string"""
+    """Convierte una imagen PIL a cadena base64"""
     buffer = io.BytesIO()
     image.save(buffer, format=format)
     return base64.b64encode(buffer.getvalue()).decode()
 
 def create_overlay(original: Image.Image, mask: np.ndarray, alpha: float = 0.5) -> Image.Image:
-    """Create overlay of mask on original image"""
+    """Crea una superposición de la máscara sobre la imagen original"""
     original = original.resize(Config.TARGET_SIZE, Image.BILINEAR)
     original_np = np.array(original)
     
@@ -385,42 +399,42 @@ def create_overlay(original: Image.Image, mask: np.ndarray, alpha: float = 0.5) 
     elif original_np.shape[-1] == 4:
         original_np = original_np[:, :, :3]
     
-    # Create colored mask (green for segmentation)
+    # Crear máscara coloreada (verde para segmentación)
     overlay = original_np.copy()
     mask_bool = mask > 0.5
     
-    # Apply green tint where mask is present
+    # Aplicar tinte verde donde hay máscara
     overlay[mask_bool, 0] = np.clip(overlay[mask_bool, 0] * (1 - alpha), 0, 255)
     overlay[mask_bool, 1] = np.clip(overlay[mask_bool, 1] * (1 - alpha) + 255 * alpha, 0, 255)
     overlay[mask_bool, 2] = np.clip(overlay[mask_bool, 2] * (1 - alpha), 0, 255)
     
-    # Add contour
+    # Añadir contorno
     from scipy import ndimage
     contour = ndimage.binary_dilation(mask_bool) ^ mask_bool
-    overlay[contour] = [255, 255, 0]  # Yellow contour
+    overlay[contour] = [255, 255, 0]  # Contorno amarillo
     
     return Image.fromarray(overlay.astype(np.uint8))
 
 
 def analyze_abcd_features(image: np.ndarray, mask: np.ndarray) -> ABCDFeatures:
     """
-    Analyze ABCD dermatoscopic features from segmented lesion
+    Analiza las características dermatoscópicas ABCD de la lesión segmentada
     
     Args:
-        image: RGB image as numpy array (H, W, 3)
-        mask: Binary segmentation mask (H, W)
+        image: Imagen RGB como array numpy (H, W, 3)
+        mask: Máscara de segmentación binaria (H, W)
     
     Returns:
-        ABCDFeatures with clinical analysis
+        ABCDFeatures con el análisis clínico
     """
-    # Initialize analyzer
-    analyzer = ABCDEAnalyzer(pixels_per_mm=10.0)  # Approximate conversion
+    # Inicializar el analizador
+    analyzer = ABCDAnalyzer(pixels_per_mm=10.0)  # Approximate conversion
     
-    # Run analysis
+    # Ejecutar análisis
     features = analyzer.analyze(image, mask)
     
-    # Calculate risk levels based on clinical thresholds
-    # A - Asymmetry: Score > 0.3 is concerning
+    # Calcular niveles de riesgo según umbrales clínicos
+    # A - Asimetría: Score > 0.3 es preocupante
     if features.asymmetry_score < 0.2:
         asymmetry_risk = "Bajo"
     elif features.asymmetry_score < 0.4:
@@ -428,7 +442,7 @@ def analyze_abcd_features(image: np.ndarray, mask: np.ndarray) -> ABCDFeatures:
     else:
         asymmetry_risk = "Alto"
     
-    # B - Border: Irregularity > 0.5 is concerning
+    # B - Borde: Irregularidad > 0.5 es preocupante
     if features.border_irregularity < 0.3:
         border_risk = "Bajo"
     elif features.border_irregularity < 0.6:
@@ -436,7 +450,7 @@ def analyze_abcd_features(image: np.ndarray, mask: np.ndarray) -> ABCDFeatures:
     else:
         border_risk = "Alto"
     
-    # C - Color: >3 colors or presence of concerning colors
+    # C - Color: >3 colores o presencia de colores preocupantes
     color_risk_score = 0
     if features.num_colors > 3:
         color_risk_score += 1
@@ -454,7 +468,7 @@ def analyze_abcd_features(image: np.ndarray, mask: np.ndarray) -> ABCDFeatures:
     else:
         color_risk = "Alto"
     
-    # D - Diameter: >6mm is concerning
+    # D - Diámetro: >6mm es preocupante
     if features.diameter_mm < 5:
         diameter_risk = "Bajo"
     elif features.diameter_mm < 8:
@@ -462,7 +476,7 @@ def analyze_abcd_features(image: np.ndarray, mask: np.ndarray) -> ABCDFeatures:
     else:
         diameter_risk = "Alto"
     
-    # Overall risk score (weighted combination)
+    # Puntuación de riesgo global (combinación ponderada)
     risk_weights = {"Bajo": 0, "Medio": 1, "Alto": 2}
     risk_score_raw = (
         risk_weights[asymmetry_risk] * 2.0 +
@@ -471,10 +485,10 @@ def analyze_abcd_features(image: np.ndarray, mask: np.ndarray) -> ABCDFeatures:
         risk_weights[diameter_risk] * 1.0
     )
     
-    # Normalize to 0-10 scale
+    # Normalizar a escala 0-10
     risk_score = min(10, (risk_score_raw / 13.0) * 10)
     
-    # Overall risk level
+    # Nivel de riesgo global
     if risk_score < 3:
         overall_risk = "Bajo"
     elif risk_score < 6:
@@ -504,17 +518,18 @@ def analyze_abcd_features(image: np.ndarray, mask: np.ndarray) -> ABCDFeatures:
     )
 
 
+
 # ============================================================================
-# FastAPI Application
+# Aplicación FastAPI
 # ============================================================================
 
-# Global instances
+ # Instancias globales
 model_manager: ModelManager = None
 db_manager: DatabaseManager = None
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Application lifespan handler"""
+    """Gestor del ciclo de vida de la aplicación"""
     global model_manager, db_manager
     
     print("Starting Skin Lesion Segmentation App...")
@@ -532,7 +547,7 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# CORS middleware
+ # Middleware CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -541,19 +556,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Serve frontend
+ # Servir frontend
 FRONTEND_DIR = Path(__file__).parent.parent / "frontend"
 if FRONTEND_DIR.exists():
     app.mount("/static", StaticFiles(directory=FRONTEND_DIR), name="static")
 
 
+
 # ============================================================================
-# API Endpoints
+# Endpoints de la API
 # ============================================================================
 
 @app.get("/", response_class=HTMLResponse)
 async def root():
-    """Serve frontend"""
+    """Servir frontend"""
     index_path = FRONTEND_DIR / "index.html"
     if index_path.exists():
         return index_path.read_text()
@@ -561,30 +577,30 @@ async def root():
 
 @app.get("/api/health")
 async def health_check():
-    """Health check endpoint"""
+    """Endpoint de comprobación de salud"""
     return {"status": "healthy", "device": str(model_manager.device)}
 
 @app.get("/api/models")
 async def get_models():
-    """Get list of available models"""
+    """Obtener lista de modelos disponibles"""
     return {"models": model_manager.get_available_models()}
 
-# Patient endpoints
+ # Endpoints de pacientes
 @app.post("/api/patients")
 async def create_patient(name: str = Form(...), notes: str = Form("")):
-    """Create a new patient"""
+    """Crear un nuevo paciente"""
     patient = db_manager.create_patient(name, notes)
     return {"success": True, "patient": patient.model_dump()}
 
 @app.get("/api/patients")
 async def get_patients():
-    """Get all patients"""
+    """Obtener todos los pacientes"""
     patients = db_manager.get_all_patients()
     return {"patients": [p.model_dump() for p in patients]}
 
 @app.get("/api/patients/{patient_id}")
 async def get_patient(patient_id: str):
-    """Get a specific patient"""
+    """Obtener un paciente específico"""
     patient = db_manager.get_patient(patient_id)
     if not patient:
         raise HTTPException(status_code=404, detail="Patient not found")
@@ -602,6 +618,13 @@ async def get_patient_results(patient_id: str):
     """Get all results for a patient"""
     results = db_manager.get_patient_results(patient_id)
     return {"results": [r.model_dump() for r in results]}
+
+@app.delete("/api/results/{result_id}")
+async def delete_result(result_id: str):
+    """Delete a specific analysis result"""
+    if db_manager.delete_result(result_id):
+        return {"success": True}
+    raise HTTPException(status_code=404, detail="Result not found")
 
 # Prediction endpoint
 @app.post("/api/predict")

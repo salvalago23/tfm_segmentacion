@@ -821,7 +821,7 @@
                                 <span class="risk-score" id="overallRiskScore">(-/10)</span>
                             </div>
                         </div>
-                        
+
                         <div class="abcd-grid">
                             <!-- A - Asymmetry -->
                             <div class="abcd-card">
@@ -985,7 +985,7 @@
 
     <script>
         // ========================================
-        // State
+        // Estado
         // ========================================
         let selectedPatientId = null;
         let selectedFile = null;
@@ -993,7 +993,7 @@
         let models = [];
 
         // ========================================
-        // API Functions
+        // Funciones de API
         // ========================================
         const API_BASE = '/api';
 
@@ -1003,7 +1003,7 @@
         }
 
         // ========================================
-        // Initialization
+        // Inicialización
         // ========================================
         document.addEventListener('DOMContentLoaded', async () => {
             await loadModels();
@@ -1051,7 +1051,7 @@
         }
 
         // ========================================
-        // Patient Management
+        // Gestión de pacientes
         // ========================================
         function renderPatientList() {
             const container = document.getElementById('patientList');
@@ -1144,6 +1144,25 @@
             }
         }
 
+        async function deleteResult(resultId) {
+            if (!confirm('¿Estás seguro de eliminar este análisis?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetchAPI(`/results/${resultId}`, { method: 'DELETE' });
+                
+                if (response.success) {
+                    await loadPatientHistory();
+                } else {
+                    alert('Error al eliminar el análisis');
+                }
+            } catch (e) {
+                console.error('Error deleting result:', e);
+                alert('Error al eliminar el análisis');
+            }
+        }
+
         async function loadPatientHistory() {
             if (!selectedPatientId) return;
             
@@ -1171,7 +1190,12 @@
                     <div class="history-item" onclick="showResultDetail('${r.id}')">
                         <img src="data:image/png;base64,${r.overlay_image}" alt="Result">
                         <div class="history-meta">
-                            <div class="history-date">${formatDateTime(r.created_at)}</div>
+                            <div class="history-date" style="display: flex; justify-content: space-between; align-items: center;">
+                                <span>${formatDateTime(r.created_at)}</span>
+                                <button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); deleteResult('${r.id}')" title="Eliminar análisis">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
                             <div class="history-stats">
                                 <span><i class="fas fa-clock"></i> ${r.inference_time_ms}ms</span>
                                 <span><i class="fas fa-percentage"></i> ${r.lesion_coverage}%</span>
@@ -1188,7 +1212,7 @@
         }
 
         // ========================================
-        // File Upload & Prediction
+        // Subida de archivos y predicción
         // ========================================
         function setupDragDrop() {
             const zone = document.getElementById('uploadZone');
@@ -1379,7 +1403,7 @@
         }
 
         // ========================================
-        // Result Detail Modal
+        // Modal de detalle de resultado
         // ========================================
         function showResultDetail(resultId) {
             // Find result in patient history
@@ -1454,7 +1478,7 @@
         }
 
         // ========================================
-        // Utilities
+        // Utilidades
         // ========================================
         function formatDate(isoString) {
             return new Date(isoString).toLocaleDateString('es-ES');

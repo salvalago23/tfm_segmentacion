@@ -2,6 +2,6 @@
 Clinical Analysis Module for ABCDE Features
 """
 
-from .abcde_analyzer import ABCDEAnalyzer, ABCDEFeatures
+from .abcd_analyzer import ABCDAnalyzer, ABCDFeatures
 
-__all__ = ['ABCDEAnalyzer', 'ABCDEFeatures']
+__all__ = ['ABCDAnalyzer', 'ABCDFeatures']
