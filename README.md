@@ -24,6 +24,9 @@ Dataset completo descargado antes del procesamiento:
 # Total descargado: ~13 GB
 
 
+### Todo el EDA, entrenamiento de modelos y análisis de los resultados de los mismos se pueden encontrar en los 3 Jupyter Notebook del directorio ./notebooks
+
+### Para ejecutar la app, basta con moverse al directorio ./app y ejecutar el archivo bash run.sh
 
 
 
