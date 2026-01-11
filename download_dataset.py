@@ -155,8 +155,8 @@ def organize_dataset(base_folder="data"):
     
     print("\nDataset organization complete!")
 
-def preprocess_image(image_path, target_size=(256, 256), normalize=True):
-    """Preprocess a single image"""
+def preprocess_image(image_path, target_size=(256, 256)):
+    """Preprocess a single image (keeps uint8 [0-255] for Albumentations compatibility)"""
     # Leer imagen
     img = cv2.imread(str(image_path))
     if img is None:
@@ -168,11 +168,8 @@ def preprocess_image(image_path, target_size=(256, 256), normalize=True):
     # Redimensionar
     img = cv2.resize(img, target_size, interpolation=cv2.INTER_LINEAR)
     
-    # Normalizar a [0, 1] si se solicita
-    if normalize:
-        img = img.astype(np.float32) / 255.0
-    
-    return img
+    # Mantener como uint8 [0-255] - la normalización se hace en el Dataset
+    return img.astype(np.uint8)
 
 def preprocess_mask(mask_path, target_size=(256, 256)):
     """Preprocesar una sola máscara"""
@@ -249,22 +246,21 @@ def preprocess_dataset(base_folder="data", target_size=(256, 256)):
                     # Intentar sin el sufijo _segmentation
                     mask_path = input_masks / f"{img_id}.png"
                     if not mask_path.exists():
-                        print(f"\n⚠ Mask not found for {img_id}, skipping...")
+                        print(f"\nMask not found for {img_id}, skipping...")
                         continue
             
             try:
-                # Procesar imagen
-                image_proc = preprocess_image(img_path, target_size, normalize=True)
+                # Procesar imagen (uint8 [0-255])
+                image_proc = preprocess_image(img_path, target_size)
                 
                 # Guardar imagen procesada
                 img_output = dataset_output / "images" / f"{img_id}.npy"
                 np.save(img_output, image_proc)
                 
-                # Procesar y guardar máscara si existe
-                if mask_path:
-                    mask_proc = preprocess_mask(mask_path, target_size)
-                    mask_output = dataset_output / "masks" / f"{img_id}.npy"
-                    np.save(mask_output, mask_proc)
+                # Procesar y guardar máscara
+                mask_proc = preprocess_mask(mask_path, target_size)
+                mask_output = dataset_output / "masks" / f"{img_id}.npy"
+                np.save(mask_output, mask_proc)
                 
                 processed_count += 1
                 

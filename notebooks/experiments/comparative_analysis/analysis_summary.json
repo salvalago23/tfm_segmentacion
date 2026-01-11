@@ -16,27 +16,42 @@
     "TransUNet"
   ],
   "mejor_modelo": {
-    "nombre": "DeepLabV3+",
+    "nombre": "TransUNet",
     "metricas": {
-      "Modelo": "DeepLabV3+",
-      "Dice Score": 0.8724584670066834,
-      "Dice ± std": "0.874 ± 0.135",
-      "IoU": 0.778479043006897,
-      "IoU ± std": "0.796 ± 0.163",
-      "Precisión": 0.8780893726348877,
-      "Recall": 0.8765991806983948,
-      "F1-Score": 0.8724579916000367,
-      "Dice Mediana": 0.9190306232970876,
-      "Dice P25-P75": "0.867-0.944",
-      "Parámetros (M)": "20.3"
+      "dice": 0.8519396929740906,
+      "iou": 0.7495227620601654,
+      "precision": 0.8732154788970947,
+      "recall": 0.8454203548431396,
+      "f1": 0.8519392175674438,
+      "dice_mean": 0.8578253687449267,
+      "dice_std": 0.16548981627449924,
+      "dice_median": 0.9146857031442597,
+      "dice_min": 0.0,
+      "dice_max": 0.9821288538122858,
+      "iou_mean": 0.7777050175094539,
+      "iou_std": 0.1873552933171757,
+      "precision_mean": 0.8625956220775126,
+      "recall_mean": 0.9021518313674853,
+      "f1_mean": 0.8819299075374509,
+      "num_samples": 1000,
+      "dice_p25": 0.8535008524576662,
+      "iou_p25": 0.7444408982417383,
+      "dice_p50": 0.9146857031442597,
+      "iou_p50": 0.8427841648836643,
+      "dice_p75": 0.9419121250221019,
+      "iou_p75": 0.8902021740747856,
+      "dice_p90": 0.9599439569380531,
+      "iou_p90": 0.9229733000034549,
+      "dice_p95": 0.966575550392363,
+      "iou_p95": 0.9353132531168228
     }
   },
   "resumen_estadistico": {
     "num_modelos": 6,
     "num_muestras": 1000,
-    "dice_promedio": 0.8485537181695303,
-    "dice_maximo": 0.8724584670066834,
-    "dice_minimo": 0.8210071158409119
+    "dice_promedio": 0.8180740855932237,
+    "dice_maximo": 0.8519396929740906,
+    "dice_minimo": 0.780807231426239
   },
   "archivos_generados": [
     "experiments/comparative_analysis/metrics_comparison.csv",
@@ -44,5 +59,5 @@
     "experiments/comparative_analysis/qualitative_comparison.png",
     "experiments/comparative_analysis/comparison_state_of_art.png"
   ],
-  "timestamp": "2026-01-06T01:04:04.818729"
+  "timestamp": "2026-01-10T21:22:28.112193"
 }

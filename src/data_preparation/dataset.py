@@ -1,12 +1,15 @@
 import torch
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset
 import numpy as np
 from pathlib import Path
 from typing import Tuple, Optional, Dict, Any, Union, List
 import cv2
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
-import random
+
+# Estadísticas de normalización ISIC 2018 (calculadas sobre el dataset de entrenamiento)
+ISIC_MEAN = [0.7082, 0.5819, 0.5359]
+ISIC_STD = [0.1574, 0.1657, 0.1808]
 
 class ISIC2018Dataset(Dataset):
     """
@@ -42,6 +45,7 @@ class ISIC2018Dataset(Dataset):
         
         if debug:
             print(f"Dataset {phase}: {len(self.image_ids)} imágenes")
+            print(f"Normalización ISIC: mean={ISIC_MEAN}, std={ISIC_STD}")
             if self.masks_dir:
                 print(f"Máscaras disponibles: {self.masks_dir.exists()}")
         
@@ -63,15 +67,28 @@ class ISIC2018Dataset(Dataset):
         else:
             raise FileNotFoundError(f"No se encontraron imágenes en {self.images_dir}")
     
+    def _is_using_processed_data(self) -> bool:
+        """Detecta si estamos usando datos procesados (.npy) o raw (.jpg)"""
+        # Detectar por extensión de archivos
+        npy_files = list(self.images_dir.glob("*.npy"))
+        return len(npy_files) > 0
+    
     def _get_transforms(self) -> A.Compose:
         """Configura transformaciones según la fase"""
         
+        # Detectar si usar resize (solo para raw, no para processed)
+        use_resize = not self._is_using_processed_data()
+        
         if self.phase == 'train' and self.augment:
             # Transformaciones para entrenamiento (con aumentación)
-            return A.Compose([
-                A.Resize(self.target_size[0], self.target_size[1]),
-                
-                # Aumentaciones espaciales
+            transforms = []
+            
+            # Solo resize si es necesario (datos raw)
+            if use_resize:
+                transforms.append(A.Resize(self.target_size[0], self.target_size[1]))
+            
+            # Aumentaciones espaciales
+            transforms.extend([
                 A.HorizontalFlip(p=0.5),
                 A.VerticalFlip(p=0.5),
                 A.Rotate(limit=30, p=0.5),
@@ -88,30 +105,41 @@ class ISIC2018Dataset(Dataset):
                 A.CLAHE(clip_limit=4.0, tile_grid_size=(8, 8), p=0.3),
                 A.GaussianBlur(blur_limit=3, p=0.3),
                 
-                # Normalización y conversión a tensor
-                A.Normalize(mean=[0.485, 0.456, 0.406], 
-                           std=[0.229, 0.224, 0.225]),
+                # Normalización ISIC y conversión a tensor
+                A.Normalize(mean=ISIC_MEAN, std=ISIC_STD),
                 ToTensorV2(),
             ])
+            
+            return A.Compose(transforms)
         
         else:
             # Transformaciones para validación/test (solo resize + normalización)
-            return A.Compose([
-                A.Resize(self.target_size[0], self.target_size[1]),
-                A.Normalize(mean=[0.485, 0.456, 0.406], 
-                           std=[0.229, 0.224, 0.225]),
+            transforms = []
+            
+            # Solo resize si es necesario (datos raw)
+            if use_resize:
+                transforms.append(A.Resize(self.target_size[0], self.target_size[1]))
+            
+            transforms.extend([
+                A.Normalize(mean=ISIC_MEAN, std=ISIC_STD),
                 ToTensorV2(),
             ])
+            
+            return A.Compose(transforms)
     
     def _load_image(self, image_id: str) -> np.ndarray:
-        """Carga una imagen por ID"""
+        """Carga una imagen por ID (espera uint8 [0-255])"""
         # Intentar cargar .npy primero
         npy_path = self.images_dir / f"{image_id}.npy"
         if npy_path.exists():
             image = np.load(npy_path)
-            # Si la imagen ya está normalizada [0, 1], convertir a uint8
-            if image.max() <= 1.0:
-                image = (image * 255).astype(np.uint8)
+            # Asegurar que sea uint8
+            if image.dtype != np.uint8:
+                if image.max() <= 1.0:
+                    # Imagen en [0,1] float - convertir a uint8
+                    image = (image * 255).astype(np.uint8)
+                else:
+                    image = image.astype(np.uint8)
             return image
         
         # Si no hay .npy, cargar .jpg

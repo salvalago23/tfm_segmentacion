@@ -95,7 +95,7 @@ class ISICDataLoader:
         
         print(f"  Val: {len(self.val_dataset)} imágenes")
         
-        # Dataset de test (opcional)
+        # Dataset de test
         test_images_dir = f"{self.base_path}/{data_subdir}/test/images"
         test_masks_dir = f"{self.base_path}/{data_subdir}/test/masks"
         
@@ -277,9 +277,9 @@ class ISICDataLoader:
             img_np = images[i].cpu().numpy()
             img_np = np.transpose(img_np, (1, 2, 0))
             
-            # Desnormalizar usando stats de ImageNet
-            mean = np.array([0.485, 0.456, 0.406])
-            std = np.array([0.229, 0.224, 0.225])
+            # Desnormalizar usando stats de ISIC 2018
+            mean = np.array([0.7082, 0.5819, 0.5359])
+            std = np.array([0.1574, 0.1657, 0.1808])
             img_np = img_np * std + mean
             img_np = np.clip(img_np, 0, 1)
             
