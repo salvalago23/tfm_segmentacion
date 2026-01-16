@@ -16,42 +16,42 @@
     "TransUNet"
   ],
   "mejor_modelo": {
-    "nombre": "TransUNet",
+    "nombre": "DeepLabV3+",
     "metricas": {
-      "dice": 0.8519396929740906,
-      "iou": 0.7495227620601654,
-      "precision": 0.8732154788970947,
-      "recall": 0.8454203548431396,
-      "f1": 0.8519392175674438,
-      "dice_mean": 0.8578253687449267,
-      "dice_std": 0.16548981627449924,
-      "dice_median": 0.9146857031442597,
+      "dice": 0.8762826972007751,
+      "iou": 0.7852051343917846,
+      "precision": 0.8886323742866516,
+      "recall": 0.8754120235443115,
+      "f1": 0.8762822160720826,
+      "dice_mean": 0.877369940260829,
+      "dice_std": 0.1412212500316956,
+      "dice_median": 0.9229694367656133,
       "dice_min": 0.0,
-      "dice_max": 0.9821288538122858,
-      "iou_mean": 0.7777050175094539,
-      "iou_std": 0.1873552933171757,
-      "precision_mean": 0.8625956220775126,
-      "recall_mean": 0.9021518313674853,
-      "f1_mean": 0.8819299075374509,
+      "dice_max": 0.9871836763973719,
+      "iou_mean": 0.802195035894128,
+      "iou_std": 0.1673640701930023,
+      "precision_mean": 0.8731654444141308,
+      "recall_mean": 0.9182377008271958,
+      "f1_mean": 0.8951340569914539,
       "num_samples": 1000,
-      "dice_p25": 0.8535008524576662,
-      "iou_p25": 0.7444408982417383,
-      "dice_p50": 0.9146857031442597,
-      "iou_p50": 0.8427841648836643,
-      "dice_p75": 0.9419121250221019,
-      "iou_p75": 0.8902021740747856,
-      "dice_p90": 0.9599439569380531,
-      "iou_p90": 0.9229733000034549,
-      "dice_p95": 0.966575550392363,
-      "iou_p95": 0.9353132531168228
+      "dice_p25": 0.8707572218232802,
+      "iou_p25": 0.7710984079590836,
+      "dice_p50": 0.9229694367656133,
+      "iou_p50": 0.8569575842894173,
+      "dice_p75": 0.9500088086867403,
+      "iou_p75": 0.9047778860633376,
+      "dice_p90": 0.9654622476071546,
+      "iou_p90": 0.9332305626126551,
+      "dice_p95": 0.9726970661081187,
+      "iou_p95": 0.9468454085672776
     }
   },
   "resumen_estadistico": {
     "num_modelos": 6,
     "num_muestras": 1000,
-    "dice_promedio": 0.8180740855932237,
-    "dice_maximo": 0.8519396929740906,
-    "dice_minimo": 0.780807231426239
+    "dice_promedio": 0.864295661692761,
+    "dice_maximo": 0.877369940260829,
+    "dice_minimo": 0.8552154562287893
   },
   "archivos_generados": [
     "experiments/comparative_analysis/metrics_comparison.csv",
@@ -59,5 +59,5 @@
     "experiments/comparative_analysis/qualitative_comparison.png",
     "experiments/comparative_analysis/comparison_state_of_art.png"
   ],
-  "timestamp": "2026-01-10T21:22:28.112193"
+  "timestamp": "2026-01-16T01:12:20.917456"
 }

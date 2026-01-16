@@ -6,10 +6,118 @@ from typing import Tuple, Optional, Dict, Any, Union, List
 import cv2
 import albumentations as A
 from albumentations.pytorch import ToTensorV2
+from albumentations.core.transforms_interface import ImageOnlyTransform, DualTransform
 
 # Estadísticas de normalización ISIC 2018 (calculadas sobre el dataset de entrenamiento)
 ISIC_MEAN = [0.7082, 0.5819, 0.5359]
 ISIC_STD = [0.1574, 0.1657, 0.1808]
+
+
+class ResizeWithAspectRatioPadding(DualTransform):
+    """
+    Redimensiona imagen y máscara preservando la relación de aspecto,
+    añadiendo padding para alcanzar el tamaño objetivo.
+    
+    Esto evita distorsiones geométricas que afectarían la morfología de la lesión
+    (criterio diagnóstico clave en la regla ABCD).
+    """
+    
+    def __init__(
+        self,
+        height: int,
+        width: int,
+        pad_value: int = 0,
+        mask_pad_value: int = 0,
+        interpolation: int = cv2.INTER_LINEAR,
+        always_apply: bool = False,
+        p: float = 1.0
+    ):
+        """
+        Args:
+            height: Altura objetivo
+            width: Ancho objetivo
+            pad_value: Valor de padding para imágenes (0-255)
+            mask_pad_value: Valor de padding para máscaras (0 o 1)
+            interpolation: Método de interpolación para resize
+        """
+        super().__init__(always_apply, p)
+        self.height = height
+        self.width = width
+        self.pad_value = pad_value
+        self.mask_pad_value = mask_pad_value
+        self.interpolation = interpolation
+    
+    def apply(self, img: np.ndarray, **params) -> np.ndarray:
+        """Aplica resize con padding a la imagen"""
+        return self._resize_with_padding(
+            img, 
+            self.height, 
+            self.width, 
+            self.pad_value,
+            self.interpolation
+        )
+    
+    def apply_to_mask(self, mask: np.ndarray, **params) -> np.ndarray:
+        """Aplica resize con padding a la máscara (usa NEAREST para preservar valores binarios)"""
+        return self._resize_with_padding(
+            mask, 
+            self.height, 
+            self.width, 
+            self.mask_pad_value,
+            cv2.INTER_NEAREST
+        )
+    
+    def _resize_with_padding(
+        self, 
+        img: np.ndarray, 
+        target_h: int, 
+        target_w: int,
+        pad_value: int,
+        interpolation: int
+    ) -> np.ndarray:
+        """
+        Redimensiona preservando aspect ratio y añade padding centrado.
+        """
+        h, w = img.shape[:2]
+        
+        # Calcular factor de escala para que el lado más largo quepa
+        scale = min(target_h / h, target_w / w)
+        
+        # Nuevas dimensiones manteniendo aspect ratio
+        new_h = int(h * scale)
+        new_w = int(w * scale)
+        
+        # Redimensionar
+        resized = cv2.resize(img, (new_w, new_h), interpolation=interpolation)
+        
+        # Calcular padding (centrado)
+        pad_top = (target_h - new_h) // 2
+        pad_bottom = target_h - new_h - pad_top
+        pad_left = (target_w - new_w) // 2
+        pad_right = target_w - new_w - pad_left
+        
+        # Aplicar padding
+        if len(img.shape) == 3:
+            # Imagen con canales (H, W, C)
+            padded = cv2.copyMakeBorder(
+                resized,
+                pad_top, pad_bottom, pad_left, pad_right,
+                cv2.BORDER_CONSTANT,
+                value=[pad_value] * img.shape[2]
+            )
+        else:
+            # Máscara (H, W)
+            padded = cv2.copyMakeBorder(
+                resized,
+                pad_top, pad_bottom, pad_left, pad_right,
+                cv2.BORDER_CONSTANT,
+                value=pad_value
+            )
+        
+        return padded
+    
+    def get_transform_init_args_names(self) -> Tuple[str, ...]:
+        return ("height", "width", "pad_value", "mask_pad_value", "interpolation")
 
 class ISIC2018Dataset(Dataset):
     """
@@ -84,8 +192,16 @@ class ISIC2018Dataset(Dataset):
             transforms = []
             
             # Solo resize si es necesario (datos raw)
+            # Usamos ResizeWithAspectRatioPadding para preservar morfología
             if use_resize:
-                transforms.append(A.Resize(self.target_size[0], self.target_size[1]))
+                transforms.append(
+                    ResizeWithAspectRatioPadding(
+                        height=self.target_size[0], 
+                        width=self.target_size[1],
+                        pad_value=0,  # Padding negro para imágenes
+                        mask_pad_value=0  # Padding 0 para máscaras (fondo)
+                    )
+                )
             
             # Aumentaciones espaciales
             transforms.extend([
@@ -117,8 +233,16 @@ class ISIC2018Dataset(Dataset):
             transforms = []
             
             # Solo resize si es necesario (datos raw)
+            # Usamos ResizeWithAspectRatioPadding para preservar morfología
             if use_resize:
-                transforms.append(A.Resize(self.target_size[0], self.target_size[1]))
+                transforms.append(
+                    ResizeWithAspectRatioPadding(
+                        height=self.target_size[0], 
+                        width=self.target_size[1],
+                        pad_value=0,
+                        mask_pad_value=0
+                    )
+                )
             
             transforms.extend([
                 A.Normalize(mean=ISIC_MEAN, std=ISIC_STD),

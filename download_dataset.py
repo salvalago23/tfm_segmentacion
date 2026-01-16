@@ -155,8 +155,77 @@ def organize_dataset(base_folder="data"):
     
     print("\nDataset organization complete!")
 
+def resize_with_aspect_ratio_padding(img, target_size, interpolation, pad_value=0):
+    """
+    Redimensiona una imagen/máscara preservando la relación de aspecto
+    y añadiendo padding centrado para alcanzar el tamaño objetivo.
+    
+    Esto evita distorsiones geométricas que afectarían la morfología de la lesión
+    (criterio diagnóstico clave en la regla ABCD para dermatoscopia).
+    
+    Args:
+        img: Imagen o máscara a redimensionar (numpy array)
+        target_size: Tupla (ancho, alto) del tamaño objetivo
+        interpolation: Método de interpolación de OpenCV
+        pad_value: Valor de relleno para el padding
+    
+    Returns:
+        Imagen/máscara redimensionada con padding
+    """
+    target_w, target_h = target_size
+    h, w = img.shape[:2]
+    
+    # Calcular factor de escala para que el lado más largo quepa
+    scale = min(target_w / w, target_h / h)
+    
+    # Nuevas dimensiones manteniendo aspect ratio
+    new_w = int(w * scale)
+    new_h = int(h * scale)
+    
+    # Redimensionar
+    resized = cv2.resize(img, (new_w, new_h), interpolation=interpolation)
+    
+    # Calcular padding (centrado)
+    pad_left = (target_w - new_w) // 2
+    pad_right = target_w - new_w - pad_left
+    pad_top = (target_h - new_h) // 2
+    pad_bottom = target_h - new_h - pad_top
+    
+    # Aplicar padding
+    if len(img.shape) == 3:
+        # Imagen con canales (H, W, C)
+        padded = cv2.copyMakeBorder(
+            resized,
+            pad_top, pad_bottom, pad_left, pad_right,
+            cv2.BORDER_CONSTANT,
+            value=[pad_value] * img.shape[2]
+        )
+    else:
+        # Máscara (H, W)
+        padded = cv2.copyMakeBorder(
+            resized,
+            pad_top, pad_bottom, pad_left, pad_right,
+            cv2.BORDER_CONSTANT,
+            value=pad_value
+        )
+    
+    return padded
+
+
 def preprocess_image(image_path, target_size=(256, 256)):
-    """Preprocess a single image (keeps uint8 [0-255] for Albumentations compatibility)"""
+    """
+    Preprocesa una imagen preservando la relación de aspecto.
+    
+    Aplica resize manteniendo aspect ratio + padding centrado para evitar
+    distorsiones geométricas que afectarían la morfología de la lesión.
+    
+    Args:
+        image_path: Ruta a la imagen
+        target_size: Tamaño objetivo (ancho, alto)
+    
+    Returns:
+        Imagen preprocesada como uint8 [0-255]
+    """
     # Leer imagen
     img = cv2.imread(str(image_path))
     if img is None:
@@ -165,24 +234,48 @@ def preprocess_image(image_path, target_size=(256, 256)):
     # Convertir BGR a RGB
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     
-    # Redimensionar
-    img = cv2.resize(img, target_size, interpolation=cv2.INTER_LINEAR)
+    # Redimensionar preservando aspect ratio con padding negro
+    img = resize_with_aspect_ratio_padding(
+        img, 
+        target_size, 
+        interpolation=cv2.INTER_LINEAR,
+        pad_value=0  # Padding negro
+    )
     
     # Mantener como uint8 [0-255] - la normalización se hace en el Dataset
     return img.astype(np.uint8)
 
+
 def preprocess_mask(mask_path, target_size=(256, 256)):
-    """Preprocesar una sola máscara"""
+    """
+    Preprocesa una máscara preservando la relación de aspecto.
+    
+    Aplica resize manteniendo aspect ratio + padding centrado.
+    Usa interpolación NEAREST para preservar valores binarios.
+    
+    Args:
+        mask_path: Ruta a la máscara
+        target_size: Tamaño objetivo (ancho, alto)
+    
+    Returns:
+        Máscara preprocesada binaria (0 o 1)
+    """
     # Leer máscara (escala de grises)
     mask = cv2.imread(str(mask_path), cv2.IMREAD_GRAYSCALE)
     if mask is None:
         raise ValueError(f"Could not read mask: {mask_path}")
     
-    # Redimensionar usando vecino más cercano para preservar valores binarios
-    mask = cv2.resize(mask, target_size, interpolation=cv2.INTER_NEAREST)
-    
-    # Binarizar (umbral en 127)
+    # Binarizar ANTES de redimensionar para evitar artefactos
     _, mask = cv2.threshold(mask, 127, 255, cv2.THRESH_BINARY)
+    
+    # Redimensionar preservando aspect ratio con padding (valor 0 = fondo)
+    # Usar INTER_NEAREST para máscaras binarias
+    mask = resize_with_aspect_ratio_padding(
+        mask, 
+        target_size, 
+        interpolation=cv2.INTER_NEAREST,
+        pad_value=0  # Padding con valor de fondo
+    )
     
     # Convertir a 0 y 1
     mask = (mask / 255).astype(np.uint8)
